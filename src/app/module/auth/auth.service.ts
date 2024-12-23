@@ -13,6 +13,13 @@ const createUserIntoDB = async (payload: TUser) => {
     );
   }
 
+  if (payload.status === "deleted" || payload.status === "inactive") {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "You are not authorized to create an inactive or deleted user"
+    );
+  }
+
   const result = await UserModel.create(payload);
   const token = generateToken(result._id, result.role);
   return { data: result, token };
