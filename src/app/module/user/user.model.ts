@@ -35,6 +35,7 @@ const userSchema = new Schema<TUser>(
     },
     source: {
       type: String,
+      default: "web",
       required: true,
     },
   },
