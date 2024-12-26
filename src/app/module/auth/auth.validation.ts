@@ -15,7 +15,7 @@ const userSigninSchema = z.object({
     .min(6, { message: "Password must be at least 6 characters long" }),
 });
 
-export const AuthValidations = {
+export const authValidations = {
   userSignupSchema,
   userSigninSchema,
 };

@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import { TUser } from "./user.interface";
 import bcrypt from "bcrypt";
-import { UserRolesArray, UserStatusArray } from "./user.constant";
+import { userRolesArray, userStatusArray } from "./user.constant";
 
 const userSchema = new Schema<TUser>(
   {
@@ -21,12 +21,12 @@ const userSchema = new Schema<TUser>(
     },
     role: {
       type: String,
-      enum: UserRolesArray,
+      enum: userRolesArray,
       default: "user",
     },
     status: {
       type: String,
-      enum: UserStatusArray,
+      enum: userStatusArray,
       default: "pending",
     },
     photo: {

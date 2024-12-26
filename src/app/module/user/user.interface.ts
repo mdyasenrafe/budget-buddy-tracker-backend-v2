@@ -1,4 +1,4 @@
-import { UserRolesObject } from "./user.constant";
+import { userRolesObject } from "./user.constant";
 
 export type TUser = {
   name: string;
@@ -10,4 +10,4 @@ export type TUser = {
   source: "web" | "app";
 };
 
-export type TUserRoles = keyof typeof UserRolesObject;
+export type TUserRoles = keyof typeof userRolesObject;

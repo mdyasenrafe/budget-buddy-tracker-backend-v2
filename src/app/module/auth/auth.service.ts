@@ -43,7 +43,7 @@ const signinUser = async (email: string, password: string) => {
   return { data: user, token };
 };
 
-export const AuthServices = {
+export const authServices = {
   createUserIntoDB,
   signinUser,
 };

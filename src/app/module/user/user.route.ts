@@ -1,22 +1,22 @@
 import express from "express";
-import { UserRolesObject } from "./user.constant";
+import { userRolesObject } from "./user.constant";
 import { validateRequest } from "../../middlewares/validateRequest";
-import { UserValidations } from "./user.validation";
-import { UserControllers } from "./user.controller";
+import { userValidations } from "./user.validation";
+import { userControllers } from "./user.controller";
 import { authenticateToken } from "../../middlewares/authMiddleware";
 
 const router = express.Router();
 
 router.get(
   "/me",
-  authenticateToken(UserRolesObject.admin, UserRolesObject.user),
-  UserControllers.getProfile
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  userControllers.getProfile
 );
 router.put(
   "/me",
-  authenticateToken(UserRolesObject.admin, UserRolesObject.user),
-  validateRequest(UserValidations.userUpdateSchema),
-  UserControllers.updateProfile
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  validateRequest(userValidations.userUpdateSchema),
+  userControllers.updateProfile
 );
 
 export const userRoutes = router;

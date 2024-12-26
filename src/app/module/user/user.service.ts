@@ -32,7 +32,7 @@ const updateUserIntoDB = async (
   return result;
 };
 
-export const Userservices = {
+export const userServices = {
   getUserFromDB,
   updateUserIntoDB,
 };
