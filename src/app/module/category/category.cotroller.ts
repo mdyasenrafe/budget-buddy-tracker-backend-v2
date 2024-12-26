@@ -1,4 +1,3 @@
-import { Request, Response } from "express";
 import { catchAsync } from "../../utils/catchAsync";
 import { categoriesServices } from "./catogory.service";
 import { sendResponse } from "../../utils/sendResponse";

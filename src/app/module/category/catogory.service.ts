@@ -1,7 +1,7 @@
-import { ICategory } from "./category.types";
-import CategoryModel from "./category.model";
+import { CategoryModel } from "./category.model";
+import { TCategory } from "./category.types";
 
-const fetchCategoriesFromDB = async (): Promise<ICategory[]> => {
+const fetchCategoriesFromDB = async (): Promise<TCategory[]> => {
   const categories = await CategoryModel.find();
   return categories;
 };
