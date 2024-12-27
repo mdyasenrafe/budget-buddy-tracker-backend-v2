@@ -20,6 +20,7 @@ const createCardOverviewToDB = async (
     totalBalance: totalBalance,
     accountHolderName: user?.name,
   };
+
   const cardOverview = await CardOverviewModel.create(payload);
 
   if (!cardOverview) {
@@ -32,7 +33,7 @@ const createCardOverviewToDB = async (
   return cardOverview;
 };
 
-const getCardOverviewByUserId = async (userId: string) => {
+const getCardOverviewByUserId = async (userId: Types.ObjectId) => {
   const cardOverview = await CardOverviewModel.findOne({ userId }).exec();
 
   if (!cardOverview) {

@@ -10,7 +10,7 @@ const createCardOverview = catchAsync(async (req: Request, res: Response) => {
   const cardOverviewData = req.body;
   const userId = req?.user?.userId;
   const result = await cardOverviewServices.createCardOverviewToDB(
-    cardOverviewData,
+    cardOverviewData?.totalBalance,
     userId
   );
   sendResponse(res, {
@@ -20,11 +20,10 @@ const createCardOverview = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getCardOverview = catchAsync(async (req: Request, res: Response) => {
-  const userId: string = req.user?._id;
-  const cardOverview =
-    await cardOverviewServices.getCardOverviewByUserId(userId);
+  const userId = req?.user?.userId;
+  const result = await cardOverviewServices.getCardOverviewByUserId(userId);
   sendResponse(res, {
-    data: cardOverview,
+    data: result,
     message: "Card Overview retrieved successfully",
   });
 });
