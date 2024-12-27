@@ -34,7 +34,9 @@ const createCardOverviewToDB = async (
 };
 
 const getCardOverviewByUserId = async (userId: Types.ObjectId) => {
-  const cardOverview = await CardOverviewModel.findOne({ userId }).exec();
+  const cardOverview = await CardOverviewModel.findOne({ userId })
+    .populate("userId")
+    .exec();
 
   if (!cardOverview) {
     throw new AppError(httpStatus.NOT_FOUND, "Card Overview not found");
