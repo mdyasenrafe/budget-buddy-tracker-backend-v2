@@ -38,10 +38,6 @@ const getCardOverviewByUserId = async (userId: Types.ObjectId) => {
     .populate("userId")
     .exec();
 
-  if (!cardOverview) {
-    throw new AppError(httpStatus.NOT_FOUND, "Card Overview not found");
-  }
-
   return cardOverview;
 };
 
