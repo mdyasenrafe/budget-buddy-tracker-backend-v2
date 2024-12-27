@@ -6,6 +6,7 @@ const CardOverviewSchema: Schema = new Schema<TCardOverview>({
     type: Schema.Types.ObjectId,
     ref: "user",
     required: true,
+    unique: true,
   },
   last4Digits: {
     type: String,
