@@ -4,7 +4,7 @@ import { TCardOverview } from "./card.type";
 const CardOverviewSchema: Schema = new Schema<TCardOverview>({
   userId: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: "user",
     required: true,
   },
   last4Digits: {
