@@ -3,7 +3,7 @@ import { uploadRoutes } from "../module/upload/upload.route";
 import { userRoutes } from "../module/user/user.route";
 import { authRoutes } from "../module/auth/auth.route";
 import { categoryRoutes } from "../module/category/category.route";
-import { cardOverviewRoutes } from "../module/cardOverview/card.route";
+import { cardOverviewRoutes } from "../module/cardOverview/cardOverview.route";
 
 const router = Router();
 

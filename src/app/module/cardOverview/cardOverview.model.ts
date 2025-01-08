@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { TCardOverview } from "./card.type";
+import { TCardOverview } from "./cardOverview.type";
 
 const CardOverviewSchema: Schema = new Schema<TCardOverview>({
   userId: {

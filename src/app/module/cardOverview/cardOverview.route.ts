@@ -1,11 +1,9 @@
 import express from "express";
 import { validateRequest } from "../../middlewares/validateRequest";
-import { authValidations } from "../auth/auth.validation";
 import { authenticateToken } from "../../middlewares/authMiddleware";
-import { userRolesArray, userRolesObject } from "../user/user.constant";
-import { userValidations } from "../user/user.validation";
-import { cardOverviewControllers } from "./card.controller";
-import { cardValidations } from "./card.validation";
+import { userRolesObject } from "../user/user.constant";
+import { cardOverviewControllers } from "./cardOverview.controller";
+import { cardValidations } from "./cardOverview.validation";
 
 const router = express.Router();
 

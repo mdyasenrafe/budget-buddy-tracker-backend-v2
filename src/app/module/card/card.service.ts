@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { CardModel } from "./card.model";
 import { TCard } from "./card.type";
 import { AppError } from "../../errors/AppError";
-import { CardOverviewModel } from "../cardOverview/card.model";
+import { CardOverviewModel } from "../cardOverview/cardOverview.model";
 
 const getCardsFromDB = async (id: string) => {
   const result = await CardModel.find({ userId: id }).populate("userId");

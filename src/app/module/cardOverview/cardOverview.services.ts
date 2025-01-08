@@ -1,9 +1,9 @@
 import httpStatus from "http-status";
-import { CardOverviewModel } from "./card.model";
+import { CardOverviewModel } from "./cardOverview.model";
 import { AppError } from "../../errors/AppError";
 import { Types } from "mongoose";
 import { UserModel } from "../user/user.model";
-import { TCardOverviewPayload } from "./card.type";
+import { TCardOverviewPayload } from "./cardOverview.type";
 
 const createCardOverviewToDB = async (
   totalBalance: number,
