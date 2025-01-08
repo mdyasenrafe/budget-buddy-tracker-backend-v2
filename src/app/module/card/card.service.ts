@@ -48,7 +48,7 @@ const createCardToDB = async (cardData: TCard, userId: string) => {
   }
 };
 
-export const CardServices = {
+export const cardServices = {
   createCardToDB,
   getCardsFromDB,
 };
