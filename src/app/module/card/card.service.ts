@@ -32,7 +32,6 @@ const createCardToDB = async (cardData: TCard, userId: string) => {
       },
       { new: true, session, upsert: true }
     );
-    console.log(cardOverview);
 
     await session.commitTransaction();
     session.endSession();
