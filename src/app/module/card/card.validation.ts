@@ -10,8 +10,6 @@ const cardCreateSchema = z.object({
     .min(1, { message: "Account holder name is required" }),
   expireDate: z.string(),
   totalBalance: z.number().nonnegative(),
-  totalDeposit: z.number().nonnegative(),
-  totalExpense: z.number().nonnegative(),
 });
 
 export const cardValidations = {
