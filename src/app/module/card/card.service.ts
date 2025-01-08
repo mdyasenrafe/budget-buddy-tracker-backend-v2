@@ -17,21 +17,22 @@ const createCardToDB = async (cardData: TCard, userId: string) => {
     const payload = {
       ...cardData,
       userId: userId,
-      totalDeposit: cardData.totalBalance,
+      totalDeposit: Number(cardData.totalBalance),
     };
 
     const newCard = await CardModel.create([payload], { session });
 
-    const user = await CardOverviewModel.findByIdAndUpdate(
-      userId,
+    const cardOverview = await CardOverviewModel.findOneAndUpdate(
+      { userId: userId },
       {
         $inc: {
           totalBalance: +cardData.totalBalance,
-          totalDeposit: +cardData.totalDeposit,
+          totalDeposit: +cardData.totalBalance,
         },
       },
-      { new: true, session }
+      { new: true, session, upsert: true }
     );
+    console.log(cardOverview);
 
     await session.commitTransaction();
     session.endSession();
