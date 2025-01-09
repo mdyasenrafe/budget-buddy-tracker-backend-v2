@@ -51,6 +51,19 @@ budgetTrackerSchema.method(
   }
 );
 
+budgetTrackerSchema.method("getSpentForLast15Minutes", function () {
+  const now = new Date();
+  const createdAt: Date = this.createdAt || now;
+
+  const timeElapsedInMinutes = Math.floor(
+    (now.getTime() - createdAt.getTime()) / (1000 * 60)
+  );
+
+  const intervalsElapsed = Math.floor(timeElapsedInMinutes / 15);
+  const spentPerInterval = this.spent / (intervalsElapsed + 1);
+  return spentPerInterval;
+});
+
 budgetTrackerSchema.virtual("isOverLimit").get(function (
   this: TBudgetDocument
 ) {
