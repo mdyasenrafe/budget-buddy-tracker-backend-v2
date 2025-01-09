@@ -1,5 +1,10 @@
 import { Schema, model } from "mongoose";
-import { TBudget } from "./budget.type";
+import {
+  TBudget,
+  TBudgetDocument,
+  TBudgetMethods,
+  TBudgetModel,
+} from "./budget.type";
 
 const budgetTrackerSchema = new Schema<TBudget>(
   {
@@ -27,8 +32,37 @@ const budgetTrackerSchema = new Schema<TBudget>(
   }
 );
 
-budgetTrackerSchema.virtual("isOverLimit").get(function () {
-  return this.spent >= this.limit;
+budgetTrackerSchema.method(
+  "getMonthlySpent",
+  function (month: number, year: number) {
+    const now = new Date();
+    const budgetStart: Date = this.createdAt || now;
+
+    const startMonth = budgetStart.getMonth();
+    const startYear = budgetStart.getFullYear();
+
+    if (year < startYear || (year === startYear && month < startMonth)) {
+      return 0;
+    }
+
+    const monthsElapsed = (year - startYear) * 12 + (month - startMonth);
+    const monthlySpent = this.spent / (monthsElapsed + 1);
+    return monthlySpent;
+  }
+);
+
+budgetTrackerSchema.virtual("isOverLimit").get(function (
+  this: TBudgetDocument
+) {
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const spentThisMonth = this.getMonthlySpent(currentMonth, currentYear);
+  return spentThisMonth >= this.limit;
 });
 
-export const BudgetModel = model<TBudget>("budget", budgetTrackerSchema);
+export const BudgetModel = model<TBudget, TBudgetModel>(
+  "budget",
+  budgetTrackerSchema
+);

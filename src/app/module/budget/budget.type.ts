@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { Model, Types } from "mongoose";
 
 export type TBudget = {
   userId: Types.ObjectId;
@@ -6,4 +6,14 @@ export type TBudget = {
   category: Types.ObjectId;
   name: string;
   spent: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 };
+
+export interface TBudgetMethods {
+  getMonthlySpent(month: number, year: number): number;
+}
+
+export type TBudgetDocument = Document & TBudget & TBudgetMethods;
+
+export type TBudgetModel = Model<TBudget, {}, TBudgetMethods>;
