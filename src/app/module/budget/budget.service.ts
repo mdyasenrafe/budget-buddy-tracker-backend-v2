@@ -3,17 +3,26 @@ import { TBudget, TBudgetRequest } from "./budget.type";
 import { BudgetModel } from "./budget.model";
 import { AppError } from "../../errors/AppError";
 import httpStatus from "http-status";
+import { CategoryModel } from "../category/category.model";
 
 const createBudgetToDB = async (
   data: TBudgetRequest,
   userId: Types.ObjectId
 ) => {
+  const category = CategoryModel.findOne({ _id: data?.category });
+  if (!category) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "The specified category does not exist"
+    );
+  }
   const payload: TBudget = {
     ...data,
     userId: userId,
     spendHistory: [{ month: new Date(), spent: 0 }],
     limitHistory: [{ month: new Date(), limit: data?.limit }],
   };
+
   const budget = await BudgetModel.create(payload);
   return budget;
 };
