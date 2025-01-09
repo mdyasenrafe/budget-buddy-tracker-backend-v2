@@ -5,6 +5,7 @@ import { authRoutes } from "../module/auth/auth.route";
 import { categoryRoutes } from "../module/category/category.route";
 import { cardOverviewRoutes } from "../module/cardOverview/cardOverview.route";
 import { cardRoutes } from "../module/card/card.route";
+import { budgetRoutes } from "../module/card/budget.route";
 
 const router = Router();
 
@@ -32,6 +33,10 @@ const modulesRoutes = [
   {
     path: "/card",
     route: cardRoutes,
+  },
+  {
+    path: "/budget",
+    route: budgetRoutes,
   },
 ];
 
