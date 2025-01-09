@@ -1,46 +1,51 @@
 import mongoose, { Schema } from "mongoose";
 import { TCardOverview } from "./cardOverview.type";
 
-const CardOverviewSchema: Schema = new Schema<TCardOverview>({
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: "user",
-    required: true,
-    unique: true,
+const CardOverviewSchema: Schema = new Schema<TCardOverview>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+      unique: true,
+    },
+    last4Digits: {
+      type: String,
+      default: "****",
+      immutable: true,
+    },
+    bankName: {
+      type: String,
+      default: "BudgetBuddyTracker",
+      immutable: true,
+    },
+    accountHolderName: {
+      type: String,
+      required: true,
+    },
+    expireDate: {
+      type: String,
+      default: "N/A",
+      immutable: true,
+    },
+    totalBalance: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+    totalDeposit: {
+      type: Number,
+      default: 0,
+    },
+    totalExpense: {
+      type: Number,
+      default: 0,
+    },
   },
-  last4Digits: {
-    type: String,
-    default: "****",
-    immutable: true,
-  },
-  bankName: {
-    type: String,
-    default: "BudgetBuddyTracker",
-    immutable: true,
-  },
-  accountHolderName: {
-    type: String,
-    required: true,
-  },
-  expireDate: {
-    type: String,
-    default: "N/A",
-    immutable: true,
-  },
-  totalBalance: {
-    type: Number,
-    required: true,
-    min: 0,
-  },
-  totalDeposit: {
-    type: Number,
-    default: 0,
-  },
-  totalExpense: {
-    type: Number,
-    default: 0,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 CardOverviewSchema.pre("save", function (next) {
   if (this.isNew || this.isModified("totalBalance")) {
