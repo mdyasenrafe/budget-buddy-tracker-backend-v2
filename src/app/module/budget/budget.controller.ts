@@ -19,7 +19,7 @@ const createBudget = catchAsync(async (req: Request, res: Response) => {
 
 const getBudgets = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
-  const monthIndex = parseInt(req.params.monthIndex);
+  const monthIndex = Number(req.params.monthIndex);
   const budgets = await budgetServices.getBudgetsFromDB(
     user?.userId,
     monthIndex

@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import cron from "node-cron";
 import { TBudget } from "./budget.type";
 
 const SpendHistorySchema = new Schema(
@@ -38,7 +39,12 @@ const budgetTrackerSchema = new Schema<TBudget>(
   }
 );
 
-budgetTrackerSchema.pre("find", async function () {
+export const BudgetModel = model<TBudget>("budget", budgetTrackerSchema);
+
+// Cron job to update spendHistory and limitHistory
+cron.schedule("0 0 1 * *", async () => {
+  console.log("Running cron job for budget updates");
+
   const currentDate = new Date();
   const startOfCurrentMonth = new Date(
     currentDate.getFullYear(),
@@ -46,23 +52,32 @@ budgetTrackerSchema.pre("find", async function () {
     1
   );
 
-  const docs = await this.model.find(this.getQuery());
+  try {
+    const budgets = await BudgetModel.find();
 
-  for (const doc of docs) {
-    const monthExists = doc.spendHistory.some(
-      (entry: { month: Date }) =>
-        entry.month.getTime() === startOfCurrentMonth.getTime()
-    );
+    for (const budget of budgets) {
+      const monthExists = budget.spendHistory.some(
+        (entry: { month: Date }) =>
+          entry.month.getTime() === startOfCurrentMonth.getTime()
+      );
 
-    if (!monthExists) {
-      doc.spendHistory.push({ month: startOfCurrentMonth, spent: 0 });
+      if (!monthExists) {
+        // Add current month's default spendHistory
+        budget.spendHistory.push({ month: startOfCurrentMonth, spent: 0 });
 
-      const lastLimit = doc.limitHistory[doc.limitHistory.length - 1]?.limit;
-      doc.limitHistory.push({ month: startOfCurrentMonth, limit: lastLimit });
+        // Copy the last limit value into the new month
+        const lastLimit =
+          budget.limitHistory[budget.limitHistory.length - 1]?.limit || 0;
+        budget.limitHistory.push({
+          month: startOfCurrentMonth,
+          limit: lastLimit,
+        });
 
-      await doc.save();
+        // Save the updated document
+        await budget.save();
+      }
     }
+  } catch (error) {
+    console.error("Error while running cron job:", error);
   }
 });
-
-export const BudgetModel = model<TBudget>("budget", budgetTrackerSchema);
