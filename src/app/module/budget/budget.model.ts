@@ -4,12 +4,12 @@ import { TBudget } from "./budget.type";
 const budgetTrackerSchema = new Schema<TBudget>(
   {
     userId: {
-      ref: "User",
+      ref: "user",
       type: Schema.Types.ObjectId,
       required: [true, "userId is required"],
     },
     category: {
-      ref: "Category",
+      ref: "category",
       type: Schema.Types.ObjectId,
       required: [true, "Category is required"],
     },
