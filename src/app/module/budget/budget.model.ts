@@ -1,10 +1,21 @@
 import { Schema, model } from "mongoose";
-import {
-  TBudget,
-  TBudgetDocument,
-  TBudgetMethods,
-  TBudgetModel,
-} from "./budget.type";
+import { TBudget } from "./budget.type";
+
+const SpendHistorySchema = new Schema(
+  {
+    month: { type: Date, required: true },
+    spent: { type: Number, default: 0 },
+  },
+  { _id: false }
+);
+
+const LimitHistorySchema = new Schema(
+  {
+    month: { type: Date, required: true },
+    limit: { type: Number, required: true },
+  },
+  { _id: false }
+);
 
 const budgetTrackerSchema = new Schema<TBudget>(
   {
@@ -13,69 +24,45 @@ const budgetTrackerSchema = new Schema<TBudget>(
       type: Schema.Types.ObjectId,
       required: [true, "userId is required"],
     },
+    name: { type: String, required: true },
     category: {
       ref: "category",
       type: Schema.Types.ObjectId,
       required: [true, "Category is required"],
     },
-    limit: {
-      type: Number,
-      required: [true, "Limit is required"],
-    },
-    spent: {
-      type: Number,
-      default: 0,
-    },
+    spendHistory: [SpendHistorySchema],
+    limitHistory: [LimitHistorySchema],
   },
   {
     timestamps: true,
   }
 );
 
-budgetTrackerSchema.method(
-  "getMonthlySpent",
-  function (month: number, year: number) {
-    const now = new Date();
-    const budgetStart: Date = this.createdAt || now;
-
-    const startMonth = budgetStart.getMonth();
-    const startYear = budgetStart.getFullYear();
-
-    if (year < startYear || (year === startYear && month < startMonth)) {
-      return 0;
-    }
-
-    const monthsElapsed = (year - startYear) * 12 + (month - startMonth);
-    const monthlySpent = this.spent / (monthsElapsed + 1);
-    return monthlySpent;
-  }
-);
-
-budgetTrackerSchema.method("getSpentForLast15Minutes", function () {
-  const now = new Date();
-  const createdAt: Date = this.createdAt || now;
-
-  const timeElapsedInMinutes = Math.floor(
-    (now.getTime() - createdAt.getTime()) / (1000 * 60)
+budgetTrackerSchema.pre("find", async function () {
+  const currentDate = new Date();
+  const startOfCurrentMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth(),
+    1
   );
 
-  const intervalsElapsed = Math.floor(timeElapsedInMinutes / 15);
-  const spentPerInterval = this.spent / (intervalsElapsed + 1);
-  return spentPerInterval;
+  const docs = await this.model.find(this.getQuery());
+
+  for (const doc of docs) {
+    const monthExists = doc.spendHistory.some(
+      (entry: { month: Date }) =>
+        entry.month.getTime() === startOfCurrentMonth.getTime()
+    );
+
+    if (!monthExists) {
+      doc.spendHistory.push({ month: startOfCurrentMonth, spent: 0 });
+
+      const lastLimit = doc.limitHistory[doc.limitHistory.length - 1]?.limit;
+      doc.limitHistory.push({ month: startOfCurrentMonth, limit: lastLimit });
+
+      await doc.save();
+    }
+  }
 });
 
-budgetTrackerSchema.virtual("isOverLimit").get(function (
-  this: TBudgetDocument
-) {
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
-
-  const spentThisMonth = this.getMonthlySpent(currentMonth, currentYear);
-  return spentThisMonth >= this.limit;
-});
-
-export const BudgetModel = model<TBudget, TBudgetModel>(
-  "budget",
-  budgetTrackerSchema
-);
+export const BudgetModel = model<TBudget>("budget", budgetTrackerSchema);
