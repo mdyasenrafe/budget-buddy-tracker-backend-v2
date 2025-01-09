@@ -3,7 +3,7 @@ import { TBudget } from "./budget.type";
 
 const SpendHistorySchema = new Schema(
   {
-    month: { type: Date, required: true },
+    month: { type: Date, default: new Date() },
     spent: { type: Number, default: 0 },
   },
   { _id: false }
@@ -11,7 +11,7 @@ const SpendHistorySchema = new Schema(
 
 const LimitHistorySchema = new Schema(
   {
-    month: { type: Date, required: true },
+    month: { type: Date, default: new Date() },
     limit: { type: Number, required: true },
   },
   { _id: false }

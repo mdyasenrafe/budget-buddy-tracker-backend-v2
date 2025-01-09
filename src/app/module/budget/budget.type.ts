@@ -1,5 +1,11 @@
 import { Types } from "mongoose";
 
+export type TBudgetRequest = {
+  category: Types.ObjectId;
+  name: string;
+  limit: number;
+};
+
 export type TSpendHistory = {
   month: Date;
   spent: number;
