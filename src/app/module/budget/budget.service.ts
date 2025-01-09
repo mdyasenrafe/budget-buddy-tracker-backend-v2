@@ -5,22 +5,34 @@ import { AppError } from "../../errors/AppError";
 import httpStatus from "http-status";
 import { CategoryModel } from "../category/category.model";
 
+const getStartOfCurrentHour = (): Date => {
+  const now = new Date();
+  return new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    now.getHours()
+  );
+};
+
 const createBudgetToDB = async (
   data: TBudgetRequest,
   userId: Types.ObjectId
 ) => {
-  const category = CategoryModel.findOne({ _id: data?.category });
+  const category = await CategoryModel.findOne({ _id: data?.category });
   if (!category) {
     throw new AppError(
       httpStatus.NOT_FOUND,
       "The specified category does not exist"
     );
   }
+  const startOfCurrentHour = getStartOfCurrentHour();
+
   const payload: TBudget = {
     ...data,
     userId: userId,
-    spendHistory: [{ month: new Date(), spent: 0 }],
-    limitHistory: [{ month: new Date(), limit: data?.limit }],
+    spendHistory: [{ month: startOfCurrentHour, spent: 0 }],
+    limitHistory: [{ month: startOfCurrentHour, limit: data?.limit }],
   };
 
   const budget = await BudgetModel.create(payload);
