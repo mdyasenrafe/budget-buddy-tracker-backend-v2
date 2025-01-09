@@ -43,7 +43,7 @@ const getBudgetsFromDB = async (
   return budgets;
 };
 
-export const BudgetServices = {
+export const budgetServices = {
   createBudgetToDB,
   getBudgetsFromDB,
 };
