@@ -5,16 +5,6 @@ import { AppError } from "../../errors/AppError";
 import httpStatus from "http-status";
 import { CategoryModel } from "../category/category.model";
 
-const getStartOfCurrentHour = (): Date => {
-  const now = new Date();
-  return new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    now.getHours()
-  );
-};
-
 const createBudgetToDB = async (
   data: TBudgetRequest,
   userId: Types.ObjectId
@@ -26,13 +16,11 @@ const createBudgetToDB = async (
       "The specified category does not exist"
     );
   }
-  const startOfCurrentHour = getStartOfCurrentHour();
 
   const payload: TBudget = {
     ...data,
     userId: userId,
-    spendHistory: [{ month: startOfCurrentHour, spent: 0 }],
-    limitHistory: [{ month: startOfCurrentHour, limit: data?.limit }],
+    spent: 0,
   };
 
   const budget = await BudgetModel.create(payload);
@@ -44,15 +32,21 @@ const getBudgetsFromDB = async (
   monthIndex: number
 ) => {
   const startOfMonth = new Date(new Date().getFullYear(), monthIndex, 1);
-  const endOfMonth = new Date(new Date().getFullYear(), monthIndex + 1, 0);
+  const endOfMonth = new Date(
+    new Date().getFullYear(),
+    monthIndex + 1,
+    0,
+    23,
+    59,
+    59
+  );
 
   const budgets = await BudgetModel.find({
     userId: userId,
-    "spendHistory.month": { $gte: startOfMonth, $lte: endOfMonth },
+    createdAt: { $gte: startOfMonth, $lte: endOfMonth },
   })
     .populate("category")
-    .populate("userId")
-    .select("limitHistory spendHistory");
+    .populate("userId");
 
   if (!budgets.length) {
     throw new AppError(

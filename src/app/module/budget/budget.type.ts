@@ -6,30 +6,12 @@ export type TBudgetRequest = {
   limit: number;
 };
 
-export type TSpendHistory = {
-  month: Date;
-  spent: number;
-};
-
-export type TLimitHistory = {
-  month: Date;
-  limit: number;
-};
-
 export type TBudget = {
   userId: Types.ObjectId;
   name: string;
   category: Types.ObjectId;
-  spendHistory: TSpendHistory[];
-  limitHistory: TLimitHistory[];
+  spent: number;
+  limit: number;
   createdAt?: Date;
   updatedAt?: Date;
 };
-
-// export interface TBudgetMethods {
-//   getMonthlySpent(month: number, year: number): number;
-// }
-
-// export type TBudgetDocument = Document & TBudget & TBudgetMethods;
-
-// export type TBudgetModel = Model<TBudget, {}, TBudgetMethods>;
