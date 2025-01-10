@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { TBudgetStatusValues, TBudgetMonthValues } from "./budget.constant";
 
 export type TBudgetRequest = {
   category: Types.ObjectId;
@@ -12,6 +13,8 @@ export type TBudget = {
   category: Types.ObjectId;
   spent: number;
   limit: number;
+  status: (typeof TBudgetStatusValues)[number];
+  month: (typeof TBudgetMonthValues)[number];
   createdAt?: Date;
   updatedAt?: Date;
 };
