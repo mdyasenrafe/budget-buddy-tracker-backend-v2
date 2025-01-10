@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import { TBudget } from "./budget.type";
+import { TBudgetMonthValues, TBudgetStatusValues } from "./budget.constant";
 
 const budgetTrackerSchema = new Schema<TBudget>(
   {
@@ -16,6 +17,16 @@ const budgetTrackerSchema = new Schema<TBudget>(
     },
     spent: { type: Number, default: 0 },
     limit: { type: Number, required: [true, "Limit is required"] },
+    status: {
+      type: String,
+      enum: TBudgetStatusValues,
+      default: "active",
+    },
+    month: {
+      type: String,
+      enum: TBudgetMonthValues,
+      required: [true, "Month is required"],
+    },
   },
   {
     timestamps: true,
