@@ -4,6 +4,7 @@ import { BudgetModel } from "./budget.model";
 import { AppError } from "../../errors/AppError";
 import httpStatus from "http-status";
 import { CategoryModel } from "../category/category.model";
+import { getCurrentMonth } from "../../utils/date";
 
 const createBudgetToDB = async (
   data: TBudgetRequest,
@@ -21,6 +22,8 @@ const createBudgetToDB = async (
     ...data,
     userId: userId,
     spent: 0,
+    month: getCurrentMonth(),
+    status: "active",
   };
 
   const budget = await BudgetModel.create(payload);
