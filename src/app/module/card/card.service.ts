@@ -5,7 +5,10 @@ import { AppError } from "../../errors/AppError";
 import { CardOverviewModel } from "../cardOverview/cardOverview.model";
 
 const getCardsFromDB = async (id: string) => {
-  const result = await CardModel.find({ userId: id }).populate("userId");
+  const result = await CardModel.find({
+    userId: id,
+    status: "active",
+  }).populate("userId");
   return result;
 };
 
