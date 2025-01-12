@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import {
   TTransactionStatusValues,
   TTransactionTypeValues,
@@ -10,7 +11,7 @@ export type TTransaction = {
   date: Date;
   type: (typeof TTransactionTypeValues)[number];
   category: string;
-  userId: string;
-  cardId: string;
+  user: Types.ObjectId;
+  card: Types.ObjectId;
   status: (typeof TTransactionStatusValues)[number];
 };
