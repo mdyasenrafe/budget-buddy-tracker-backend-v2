@@ -34,6 +34,10 @@ const TransactionSchema: Schema = new Schema<TTransaction>(
       enum: ["active", "deleted"],
       default: "active",
     },
+    budget: {
+      type: Schema.Types.ObjectId,
+      required: true,
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: "user",

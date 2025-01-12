@@ -10,6 +10,7 @@ export type TTransaction = {
   amount: number;
   date: Date;
   type: (typeof TTransactionTypeValues)[number];
+  budget: Types.ObjectId;
   category: Types.ObjectId;
   user: Types.ObjectId;
   card: Types.ObjectId;
