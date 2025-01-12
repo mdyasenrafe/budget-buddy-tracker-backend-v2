@@ -53,8 +53,57 @@ const createCardToDB = async (cardData: TCard, userId: string) => {
   }
 };
 
+const updateCardInDB = async (id: string, updateData: Partial<TCard>) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const existingCard = await CardModel.findById(id);
+    if (!existingCard) {
+      throw new AppError(404, "Card not found");
+    }
+
+    const result = await CardModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+      runValidators: true,
+      session,
+    });
+
+    if (
+      updateData.totalBalance &&
+      existingCard.totalBalance !== updateData.totalBalance
+    ) {
+      const balanceDifference =
+        updateData.totalBalance - existingCard.totalBalance;
+      await CardOverviewModel.findOneAndUpdate(
+        { userId: existingCard.userId },
+        {
+          $inc: {
+            totalBalance: balanceDifference,
+          },
+        },
+        { session }
+      );
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return result;
+  } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
+
+    throw new AppError(
+      error.statusCode || 500,
+      error.message || "An error occurred during card update"
+    );
+  }
+};
+
 export const cardServices = {
   createCardToDB,
   getCardsFromDB,
   getCardsByIdFromDB,
+  updateCardInDB,
 };

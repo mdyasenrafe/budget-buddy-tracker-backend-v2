@@ -12,6 +12,12 @@ router.post(
   validateRequest(cardValidations.cardCreateSchema),
   cardControllers.createCard
 );
+router.put(
+  "/",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  validateRequest(cardValidations.cardUpdateSchema),
+  cardControllers.updateCard
+);
 router.get(
   "/",
   authenticateToken(userRolesObject.admin, userRolesObject.user),

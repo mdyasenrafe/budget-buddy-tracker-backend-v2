@@ -33,8 +33,19 @@ const getCardById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateCard = catchAsync(async (req: Request, res: Response) => {
+  const cardId: string = req.params.id;
+  const updateData = req.body;
+  const updatedCard = await cardServices.updateCardInDB(cardId, updateData);
+  sendResponse(res, {
+    message: "Card updated successfully",
+    data: updatedCard,
+  });
+});
+
 export const cardControllers = {
   createCard,
   getCards,
   getCardById,
+  updateCard,
 };
