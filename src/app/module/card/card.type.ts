@@ -1,4 +1,5 @@
 import { Types } from "mongoose";
+import { TCardStatusValues } from "./card.constant";
 
 export type TCard = {
   userId: Types.ObjectId;
@@ -9,4 +10,5 @@ export type TCard = {
   totalBalance: number;
   totalDeposit: number;
   totalExpense: number;
+  status: (typeof TCardStatusValues)[number];
 };

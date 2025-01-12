@@ -1,5 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import { TCard } from "./card.type";
+import { TCardStatusValues } from "./card.constant";
 
 const CardSchema: Schema = new Schema<TCard>(
   {
@@ -36,6 +37,11 @@ const CardSchema: Schema = new Schema<TCard>(
     totalExpense: {
       type: Number,
       default: 0,
+    },
+    status: {
+      type: String,
+      enum: TCardStatusValues,
+      default: "active",
     },
   },
   {
