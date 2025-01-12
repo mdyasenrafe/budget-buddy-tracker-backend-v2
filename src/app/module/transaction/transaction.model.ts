@@ -28,14 +28,11 @@ const TransactionSchema: Schema = new Schema<TTransaction>(
     category: {
       type: Schema.Types.ObjectId,
       required: true,
-    },
-    status: {
-      type: String,
-      enum: ["active", "deleted"],
-      default: "active",
+      ref: "category",
     },
     budget: {
       type: Schema.Types.ObjectId,
+      ref: "budget",
     },
     user: {
       type: Schema.Types.ObjectId,
@@ -45,7 +42,11 @@ const TransactionSchema: Schema = new Schema<TTransaction>(
     card: {
       type: Schema.Types.ObjectId,
       ref: "card",
-      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["active", "deleted"],
+      default: "active",
     },
   },
   {

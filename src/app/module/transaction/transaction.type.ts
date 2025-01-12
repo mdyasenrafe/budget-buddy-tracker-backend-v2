@@ -13,6 +13,6 @@ export type TTransaction = {
   budget?: Types.ObjectId;
   category: Types.ObjectId;
   user: Types.ObjectId;
-  card: Types.ObjectId;
+  card?: Types.ObjectId;
   status: (typeof TTransactionStatusValues)[number];
 };

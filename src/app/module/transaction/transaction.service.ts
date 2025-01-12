@@ -1,23 +1,119 @@
-/**
- * @function addTransaction
- * Handles the addition of a transaction based on its type (income or expense).
- *
- * Process:
- * 1. Determine the transaction type (income or expense).
- *
- * For Income:
- * - If a card is selected:
- *    - Update the card's `totalBalance` and `totalDeposit`.
- *    - Update the `CardOverviewModel` to reflect the new balance and deposit.
- *
- * For Expense:
- * - If a budget is selected:
- *    - Check if the budget exists:
- *        - If it exists, update the `spent` value in the budget model.
- * - If a card is selected:
- *    - Update the card's `totalBalance` and `totalExpense`.
- *    - Update the `CardOverviewModel` to reflect the new balance and expense.
- *
- * lastly we need to add this transction to our transaction model
- */
-const addTransaction = () => {};
+import mongoose, { Schema, Types } from "mongoose";
+import { TTransaction } from "./transaction.type";
+import { BudgetModel } from "../budget/budget.model";
+import { AppError } from "../../errors/AppError";
+import httpStatus from "http-status";
+import { CardModel } from "../card/card.model";
+import { CardOverviewModel } from "../cardOverview/cardOverview.model";
+import { TransactionModel } from "./transaction.model";
+
+const addTransaction = async (data: TTransaction, userId: Types.ObjectId) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const { type, amount, budget: budgetId, card: cardId } = data;
+
+    if (!type || !["income", "expense"].includes(type)) {
+      throw new AppError(httpStatus.BAD_REQUEST, "Invalid transaction type");
+    }
+
+    if (type === "expense") {
+      await handleExpenseTransaction(budgetId, cardId, amount, userId, session);
+    } else if (type === "income") {
+      await handleIncomeTransaction(cardId, amount, userId, session);
+    }
+
+    const payload: TTransaction = {
+      ...data,
+      user: userId,
+    };
+
+    const result = await TransactionModel.create([payload], { session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return result;
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+    throw error;
+  }
+};
+
+const handleExpenseTransaction = async (
+  budgetId: Types.ObjectId | undefined,
+  cardId: Types.ObjectId | undefined,
+  amount: number,
+  userId: Types.ObjectId,
+  session: mongoose.ClientSession
+) => {
+  if (budgetId) {
+    const budget = await BudgetModel.findById(budgetId).session(session);
+
+    if (!budget) {
+      throw new AppError(httpStatus.NOT_FOUND, "Budget not found");
+    }
+
+    await BudgetModel.findByIdAndUpdate(
+      budgetId,
+      { $inc: { spent: amount } },
+      { new: true, session }
+    );
+  }
+
+  if (cardId) {
+    const card = await CardModel.findById(cardId).session(session);
+
+    if (!card) {
+      throw new AppError(httpStatus.NOT_FOUND, "Card not found");
+    }
+
+    await CardModel.findByIdAndUpdate(
+      cardId,
+      {
+        $inc: { totalBalance: -amount, totalExpense: amount },
+      },
+      { new: true, session }
+    );
+  }
+
+  // Update CardOverview
+  await CardOverviewModel.findOneAndUpdate(
+    { userId },
+    {
+      $inc: { totalBalance: -amount, totalExpense: amount },
+    },
+    { new: true, upsert: true, session }
+  );
+};
+
+const handleIncomeTransaction = async (
+  cardId: Types.ObjectId | undefined,
+  amount: number,
+  userId: Types.ObjectId,
+  session: mongoose.ClientSession
+) => {
+  if (cardId) {
+    const card = await CardModel.findById(cardId).session(session);
+    if (!card) {
+      throw new AppError(httpStatus.NOT_FOUND, "Card not found");
+    }
+
+    await CardModel.findByIdAndUpdate(
+      cardId,
+      {
+        $inc: { totalBalance: amount, totalDeposit: amount },
+      },
+      { new: true, session }
+    );
+  }
+  await CardOverviewModel.findOneAndUpdate(
+    { userId },
+    {
+      $inc: { totalBalance: amount, totalDeposit: amount },
+    },
+    { new: true, upsert: true, session }
+  );
+};
