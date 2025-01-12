@@ -101,9 +101,50 @@ const updateCardInDB = async (id: string, updateData: Partial<TCard>) => {
   }
 };
 
+const deleteCardFromDB = async (id: string) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const card = await CardModel.findOneAndUpdate(
+      { _id: id },
+      { status: "deleted" },
+      { new: true, session }
+    );
+
+    if (!card) {
+      throw new AppError(404, "Card not found");
+    }
+
+    await CardOverviewModel.findOneAndUpdate(
+      { userId: card.userId },
+      {
+        $inc: {
+          totalBalance: -card.totalBalance,
+          totalDeposit: -card.totalBalance,
+        },
+      },
+      { session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+    return card;
+  } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
+
+    throw new AppError(
+      error.statusCode || 500,
+      error.message || "An error occurred during card deletion"
+    );
+  }
+};
+
 export const cardServices = {
   createCardToDB,
   getCardsFromDB,
   getCardsByIdFromDB,
   updateCardInDB,
+  deleteCardFromDB,
 };

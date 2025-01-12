@@ -43,9 +43,19 @@ const updateCard = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteCard = catchAsync(async (req: Request, res: Response) => {
+  const cardId: string = req.params.id;
+  const result = await cardServices.deleteCardFromDB(cardId);
+  sendResponse(res, {
+    message: "Card deleted successfully",
+    data: result,
+  });
+});
+
 export const cardControllers = {
   createCard,
   getCards,
   getCardById,
   updateCard,
+  deleteCard,
 };

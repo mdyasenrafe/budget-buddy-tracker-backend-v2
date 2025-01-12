@@ -13,7 +13,7 @@ router.post(
   cardControllers.createCard
 );
 router.put(
-  "/",
+  "/:id",
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   validateRequest(cardValidations.cardUpdateSchema),
   cardControllers.updateCard
@@ -27,6 +27,11 @@ router.get(
   "/:id",
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   cardControllers.getCardById
+);
+router.delete(
+  "/:id",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  cardControllers.deleteCard
 );
 
 export const cardRoutes = router;
