@@ -17,5 +17,10 @@ router.get(
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   cardControllers.getCards
 );
+router.get(
+  "/:id",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  cardControllers.getCardById
+);
 
 export const cardRoutes = router;

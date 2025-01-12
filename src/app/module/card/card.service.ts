@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { CardModel } from "./card.model";
 import { TCard } from "./card.type";
 import { AppError } from "../../errors/AppError";
@@ -6,6 +6,11 @@ import { CardOverviewModel } from "../cardOverview/cardOverview.model";
 
 const getCardsFromDB = async (id: string) => {
   const result = await CardModel.find({ userId: id }).populate("userId");
+  return result;
+};
+
+const getCardsByIdFromDB = async (id: string) => {
+  const result = await CardModel.findById(id).populate("userId");
   return result;
 };
 
@@ -51,4 +56,5 @@ const createCardToDB = async (cardData: TCard, userId: string) => {
 export const cardServices = {
   createCardToDB,
   getCardsFromDB,
+  getCardsByIdFromDB,
 };

@@ -24,7 +24,17 @@ const getCards = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getCardById = catchAsync(async (req: Request, res: Response) => {
+  const cardId: string = req?.params?.id;
+  const cards = await cardServices.getCardsByIdFromDB(cardId);
+  sendResponse(res, {
+    message: "Cards retrieved successfully",
+    data: cards,
+  });
+});
+
 export const cardControllers = {
   createCard,
   getCards,
+  getCardById,
 };
