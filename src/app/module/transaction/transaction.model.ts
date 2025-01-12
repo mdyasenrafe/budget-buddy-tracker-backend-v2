@@ -26,7 +26,7 @@ const TransactionSchema: Schema = new Schema<TTransaction>(
       required: true,
     },
     category: {
-      type: String,
+      type: Schema.Types.ObjectId,
       required: true,
     },
     status: {
