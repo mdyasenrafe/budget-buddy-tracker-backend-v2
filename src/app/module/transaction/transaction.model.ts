@@ -36,7 +36,6 @@ const TransactionSchema: Schema = new Schema<TTransaction>(
     },
     budget: {
       type: Schema.Types.ObjectId,
-      required: true,
     },
     user: {
       type: Schema.Types.ObjectId,
