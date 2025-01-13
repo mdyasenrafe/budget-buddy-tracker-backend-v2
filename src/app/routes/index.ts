@@ -6,6 +6,7 @@ import { categoryRoutes } from "../module/category/category.route";
 import { cardOverviewRoutes } from "../module/cardOverview/cardOverview.route";
 import { cardRoutes } from "../module/card/card.route";
 import { budgetRoutes } from "../module/card/budget.route";
+import { transactionRoutes } from "../module/transaction/transaction.route";
 
 const router = Router();
 
@@ -37,6 +38,10 @@ const modulesRoutes = [
   {
     path: "/budget",
     route: budgetRoutes,
+  },
+  {
+    path: "/transaction",
+    route: transactionRoutes,
   },
 ];
 
