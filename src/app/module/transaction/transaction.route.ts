@@ -19,4 +19,4 @@ router.get(
   transactionControllers.getTransactions
 );
 
-export const authRoutes = router;
+export const transactionRoutes = router;
