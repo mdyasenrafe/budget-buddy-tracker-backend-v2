@@ -8,7 +8,7 @@ import { CardOverviewModel } from "../cardOverview/cardOverview.model";
 import { TransactionModel } from "./transaction.model";
 import { QueryBuilder } from "../../builder/QueryBuilder";
 
-const getTransactionDBById = async (
+const getTransactionsFromDBByUserId = async (
   userId: Types.ObjectId,
   query: Record<string, unknown>
 ) => {
@@ -28,6 +28,11 @@ const getTransactionDBById = async (
     meta,
     result,
   };
+};
+
+const getTransactionFromDBById = async (id: string) => {
+  const result = await TransactionModel.findById(id);
+  return result;
 };
 
 const addTransaction = async (data: TTransaction, userId: Types.ObjectId) => {
@@ -139,4 +144,10 @@ const handleIncomeTransaction = async (
     },
     { new: true, upsert: true, session }
   );
+};
+
+export const transactionServices = {
+  addTransaction,
+  getTransactionsFromDBByUserId,
+  getTransactionFromDBById,
 };
