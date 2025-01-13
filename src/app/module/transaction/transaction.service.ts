@@ -13,7 +13,9 @@ const getTransactionsFromDBByUserId = async (
   query: Record<string, unknown>
 ) => {
   const usersQuery = new QueryBuilder(
-    TransactionModel.find({ user: userId }).populate("category user"),
+    TransactionModel.find({ user: userId }).populate(
+      "category user card budget"
+    ),
     query
   )
     .filter()
