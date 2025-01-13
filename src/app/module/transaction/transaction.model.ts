@@ -1,6 +1,9 @@
 import mongoose, { Schema, model } from "mongoose";
 import { TTransaction } from "./transaction.type";
-import { TTransactionStatusValues } from "./transaction.constant";
+import {
+  TTransactionStatusValues,
+  TTransactionTypeValues,
+} from "./transaction.constant";
 
 const TransactionSchema: Schema = new Schema<TTransaction>(
   {
@@ -22,7 +25,7 @@ const TransactionSchema: Schema = new Schema<TTransaction>(
     },
     type: {
       type: String,
-      enum: TTransactionStatusValues,
+      enum: TTransactionTypeValues,
       required: true,
     },
     category: {
