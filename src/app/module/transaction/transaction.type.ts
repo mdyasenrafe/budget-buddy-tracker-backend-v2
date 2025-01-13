@@ -15,5 +15,5 @@ export type TTransaction = {
   user: Types.ObjectId;
   card?: Types.ObjectId;
   status: (typeof TTransactionStatusValues)[number];
-  attachment: string;
+  attachment?: string;
 };
