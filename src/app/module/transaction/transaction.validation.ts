@@ -11,7 +11,6 @@ const createTransactionSchema = z.object({
   date: z.date({ invalid_type_error: "Invalid date format" }),
   type: z.enum(TTransactionTypeValues, { message: "Invalid transaction type" }),
   category: z.string().min(1, { message: "Category is required" }),
-  user: z.string().min(1, { message: "User is required" }),
   budget: z.string().optional(),
   card: z.string().optional(),
 });
