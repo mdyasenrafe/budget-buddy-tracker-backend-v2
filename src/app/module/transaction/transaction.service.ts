@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { TTransaction } from "./transaction.type";
 import { BudgetModel } from "../budget/budget.model";
 import { AppError } from "../../errors/AppError";
@@ -6,6 +6,29 @@ import httpStatus from "http-status";
 import { CardModel } from "../card/card.model";
 import { CardOverviewModel } from "../cardOverview/cardOverview.model";
 import { TransactionModel } from "./transaction.model";
+import { QueryBuilder } from "./builder/QueryBuilder";
+
+const getTransactionDBById = async (
+  userId: Types.ObjectId,
+  query: Record<string, unknown>
+) => {
+  const usersQuery = new QueryBuilder(
+    TransactionModel.find({ userId }).populate("category user"),
+    query
+  )
+    .filter()
+    .sort()
+    .paginate()
+    .fields();
+
+  const result = await usersQuery.modelQuery;
+  const meta = await usersQuery.countTotal();
+
+  return {
+    meta,
+    result,
+  };
+};
 
 const addTransaction = async (data: TTransaction, userId: Types.ObjectId) => {
   const session = await mongoose.startSession();
