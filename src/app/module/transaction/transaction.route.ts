@@ -18,5 +18,10 @@ router.get(
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   transactionControllers.getTransactions
 );
+router.get(
+  "/:id",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  transactionControllers.getTransactionById
+);
 
 export const transactionRoutes = router;
