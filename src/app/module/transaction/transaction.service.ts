@@ -6,7 +6,7 @@ import httpStatus from "http-status";
 import { CardModel } from "../card/card.model";
 import { CardOverviewModel } from "../cardOverview/cardOverview.model";
 import { TransactionModel } from "./transaction.model";
-import { QueryBuilder } from "./builder/QueryBuilder";
+import { QueryBuilder } from "../../builder/QueryBuilder";
 
 const getTransactionDBById = async (
   userId: Types.ObjectId,
