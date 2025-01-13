@@ -48,6 +48,9 @@ const TransactionSchema: Schema = new Schema<TTransaction>(
       enum: ["active", "deleted"],
       default: "active",
     },
+    attachment: {
+      type: String,
+    },
   },
   {
     timestamps: true,
