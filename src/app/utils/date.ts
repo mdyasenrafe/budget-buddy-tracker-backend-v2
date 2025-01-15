@@ -22,14 +22,21 @@ export const getWeeklyRanges = (
 ): TWeekRanges[] => {
   const start = dayjs(monthStart).tz(timezone).startOf("week").add(1, "day");
   const endOfMonth = dayjs(monthStart).tz(timezone).endOf("month");
+  const currentDate = dayjs().tz(timezone);
 
   const weeks: { start: Date; end: Date }[] = [];
   let currentWeekStart = start;
 
-  while (currentWeekStart.isBefore(endOfMonth)) {
-    const currentWeekEnd = currentWeekStart.endOf("week").isAfter(endOfMonth)
-      ? endOfMonth
-      : currentWeekStart.endOf("week");
+  while (
+    currentWeekStart.isBefore(endOfMonth) &&
+    currentWeekStart.isBefore(currentDate)
+  ) {
+    const currentWeekEnd = currentWeekStart.endOf("week").isAfter(currentDate)
+      ? currentDate
+      : currentWeekStart.endOf("week").isAfter(endOfMonth)
+        ? endOfMonth
+        : currentWeekStart.endOf("week");
+
     weeks.push({
       start: currentWeekStart.toDate(),
       end: currentWeekEnd.toDate(),
