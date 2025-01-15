@@ -7,6 +7,8 @@ import { CardModel } from "../card/card.model";
 import { CardOverviewModel } from "../cardOverview/cardOverview.model";
 import { TransactionModel } from "./transaction.model";
 import { QueryBuilder } from "../../builder/QueryBuilder";
+import { getWeeklyRanges } from "../../utils/date";
+import dayjs from "dayjs";
 
 const getTransactionsFromDBByUserId = async (
   userId: Types.ObjectId,
@@ -148,8 +150,65 @@ const handleIncomeTransaction = async (
   );
 };
 
+const getWeeklyTransactionByBudgetIDFromDB = async (
+  userId: Types.ObjectId,
+  budgetId: string,
+  year: number,
+  monthIndex: number,
+  timezone: string = "UTC"
+) => {
+  const monthStart = dayjs()
+    .year(year)
+    .month(monthIndex)
+    .tz(timezone)
+    .startOf("month")
+    .toDate();
+
+  const monthEnd = dayjs()
+    .year(year)
+    .month(monthIndex)
+    .tz(timezone)
+    .endOf("month")
+    .toDate();
+  console.log(
+    "month start =>",
+    dayjs(monthStart).format(),
+    "month end =>",
+    monthEnd
+  );
+  const weeklyRanges = getWeeklyRanges(monthStart, timezone);
+
+  // Fetch all transactions for the user, budget, and month range
+  const transactions = await TransactionModel.find({
+    user: userId,
+    budget: budgetId,
+    date: {
+      $gte: monthStart,
+      $lte: monthEnd,
+    },
+  });
+  console.log(weeklyRanges);
+
+  // Initialize an array to store weekly totals
+  const weeklyTotals = weeklyRanges.map(({ start, end }) => {
+    // Filter transactions for the current week and sum their amounts
+    const weekTotal = transactions
+      .filter(
+        (transaction) =>
+          new Date(transaction.date) >= start &&
+          new Date(transaction.date) <= end
+      )
+      .reduce((sum, transaction) => sum + transaction.amount, 0);
+
+    return weekTotal;
+  });
+
+  return weeklyTotals;
+};
+
 export const transactionServices = {
   addTransaction,
   getTransactionsFromDBByUserId,
   getTransactionFromDBById,
+  getWeeklyTransactionByBudgetIDFromDB,
 };

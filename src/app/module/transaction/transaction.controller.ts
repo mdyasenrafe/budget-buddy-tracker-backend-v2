@@ -44,8 +44,31 @@ const getTransactionById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getWeeklyTransactionsByBudgetID = catchAsync(
+  async (req: Request, res: Response) => {
+    const currentUser = req.user;
+    const budgetId = req?.params?.budgetId;
+    const { year, monthIndex, timezone } = req.query;
+
+    const weeklyTotals =
+      await transactionServices.getWeeklyTransactionByBudgetIDFromDB(
+        currentUser?.userId,
+        budgetId,
+        parseInt(year as string),
+        parseInt(monthIndex as string),
+        (timezone as string) || "UTC"
+      );
+
+    sendResponse(res, {
+      message: "Weekly transactions retrieved successfully",
+      data: weeklyTotals,
+    });
+  }
+);
+
 export const transactionControllers = {
   createTransaction,
   getTransactions,
   getTransactionById,
+  getWeeklyTransactionsByBudgetID,
 };

@@ -23,5 +23,10 @@ router.get(
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   transactionControllers.getTransactionById
 );
+router.get(
+  "/weekly-budget-transactions/:budgetId",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  transactionControllers.getWeeklyTransactionsByBudgetID
+);
 
 export const transactionRoutes = router;
