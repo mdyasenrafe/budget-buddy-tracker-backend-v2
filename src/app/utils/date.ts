@@ -6,12 +6,20 @@ import timezone from "dayjs/plugin/timezone";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+export type TWeekRanges = {
+  start: Date;
+  end: Date;
+};
+
 export const getCurrentMonth = (): (typeof TBudgetMonthValues)[number] => {
   const currentMonth = new Date().getMonth();
   return TBudgetMonthValues[currentMonth];
 };
 
-export const getWeeklyRanges = (monthStart: Date, timezone: string) => {
+export const getWeeklyRanges = (
+  monthStart: Date,
+  timezone: string
+): TWeekRanges[] => {
   const start = dayjs(monthStart).tz(timezone).startOf("week").add(1, "day");
   const endOfMonth = dayjs(monthStart).tz(timezone).endOf("month");
 
@@ -30,4 +38,30 @@ export const getWeeklyRanges = (monthStart: Date, timezone: string) => {
   }
 
   return weeks;
+};
+
+export const getMonthStart = (
+  year: number,
+  monthIndex: number,
+  timezone: string = "UTC"
+): Date => {
+  return dayjs()
+    .year(year)
+    .month(monthIndex)
+    .tz(timezone)
+    .startOf("month")
+    .toDate();
+};
+
+export const getMonthEnd = (
+  year: number,
+  monthIndex: number,
+  timezone: string = "UTC"
+): Date => {
+  return dayjs()
+    .year(year)
+    .month(monthIndex)
+    .tz(timezone)
+    .endOf("month")
+    .toDate();
 };

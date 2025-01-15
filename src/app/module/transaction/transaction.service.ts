@@ -7,8 +7,8 @@ import { CardModel } from "../card/card.model";
 import { CardOverviewModel } from "../cardOverview/cardOverview.model";
 import { TransactionModel } from "./transaction.model";
 import { QueryBuilder } from "../../builder/QueryBuilder";
-import { getWeeklyRanges } from "../../utils/date";
-import dayjs from "dayjs";
+import { getMonthEnd, getMonthStart, getWeeklyRanges } from "../../utils/date";
+import { calculateDateRangeTotals } from "../../utils/transactions";
 
 const getTransactionsFromDBByUserId = async (
   userId: Types.ObjectId,
@@ -157,28 +157,11 @@ const getWeeklyTransactionByBudgetIDFromDB = async (
   monthIndex: number,
   timezone: string = "UTC"
 ) => {
-  const monthStart = dayjs()
-    .year(year)
-    .month(monthIndex)
-    .tz(timezone)
-    .startOf("month")
-    .toDate();
+  const monthStart = getMonthStart(year, monthIndex, timezone);
+  const monthEnd = getMonthEnd(year, monthIndex, timezone);
 
-  const monthEnd = dayjs()
-    .year(year)
-    .month(monthIndex)
-    .tz(timezone)
-    .endOf("month")
-    .toDate();
-  console.log(
-    "month start =>",
-    dayjs(monthStart).format(),
-    "month end =>",
-    monthEnd
-  );
   const weeklyRanges = getWeeklyRanges(monthStart, timezone);
 
-  // Fetch all transactions for the user, budget, and month range
   const transactions = await TransactionModel.find({
     user: userId,
     budget: budgetId,
@@ -187,21 +170,8 @@ const getWeeklyTransactionByBudgetIDFromDB = async (
       $lte: monthEnd,
     },
   });
-  console.log(weeklyRanges);
 
-  // Initialize an array to store weekly totals
-  const weeklyTotals = weeklyRanges.map(({ start, end }) => {
-    // Filter transactions for the current week and sum their amounts
-    const weekTotal = transactions
-      .filter(
-        (transaction) =>
-          new Date(transaction.date) >= start &&
-          new Date(transaction.date) <= end
-      )
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
-
-    return weekTotal;
-  });
+  const weeklyTotals = calculateDateRangeTotals(transactions, weeklyRanges);
 
   return weeklyTotals;
 };
