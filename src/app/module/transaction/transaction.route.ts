@@ -29,4 +29,10 @@ router.get(
   transactionControllers.getWeeklyTransactionsByBudgetID
 );
 
+router.get(
+  "/weekly-card-transactions/:cardId",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  transactionControllers.getWeeklyTransactionsByCardID
+);
+
 export const transactionRoutes = router;

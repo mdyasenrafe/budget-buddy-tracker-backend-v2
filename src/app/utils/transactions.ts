@@ -35,10 +35,6 @@ export const calculateWeeklyBalances = (
 
     runningBalance += weeklyTotalChange;
 
-    return {
-      weekStart: range.start,
-      weekEnd: range.end,
-      totalBalance: runningBalance,
-    };
+    return runningBalance;
   });
 };

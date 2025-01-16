@@ -188,17 +188,14 @@ const getWeeklyTransactionByCardIDFromDB = async (
   const monthStart = getMonthStart(year, monthIndex, timezone);
   const weeklyRanges = getWeeklyRanges(monthStart, timezone);
 
-  // Fetch the card details to get the initial balance
   const card = await CardModel.findOne({ _id: cardId, userId });
 
   if (!card) {
-    throw new Error("Card not found");
+    throw new AppError(httpStatus.NOT_FOUND, "Card not found");
   }
 
-  // Use the card's totalBalance as the initial balance
   let runningBalance = card.totalBalance;
 
-  // Fetch all transactions for the card within the specified date range
   const transactions = await TransactionModel.find({
     user: userId,
     card: cardId,
@@ -223,4 +220,5 @@ export const transactionServices = {
   getTransactionsFromDBByUserId,
   getTransactionFromDBById,
   getWeeklyTransactionByBudgetIDFromDB,
+  getWeeklyTransactionByCardIDFromDB,
 };
