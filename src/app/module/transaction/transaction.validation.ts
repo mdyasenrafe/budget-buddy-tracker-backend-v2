@@ -1,8 +1,5 @@
 import { z } from "zod";
-import {
-  TTransactionTypeValues,
-  TTransactionStatusValues,
-} from "./transaction.constant";
+import { TTransactionTypeValues } from "./transaction.constant";
 
 const createTransactionSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),

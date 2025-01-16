@@ -17,3 +17,28 @@ export const calculateDateRangeTotals = (
     return total;
   });
 };
+
+export const calculateWeeklyBalances = (
+  transactions: TTransaction[],
+  weeklyRanges: TWeekRanges[],
+  runningBalance: number
+) => {
+  return weeklyRanges.map((range) => {
+    const weeklyTransactions = transactions.filter(
+      (txn) => txn.date >= range.start && txn.date <= range.end
+    );
+
+    const weeklyTotalChange = weeklyTransactions.reduce(
+      (sum, txn) => sum + txn.amount,
+      0
+    );
+
+    runningBalance += weeklyTotalChange;
+
+    return {
+      weekStart: range.start,
+      weekEnd: range.end,
+      totalBalance: runningBalance,
+    };
+  });
+};
