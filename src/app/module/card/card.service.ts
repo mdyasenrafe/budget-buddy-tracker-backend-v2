@@ -1,8 +1,11 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import { CardModel } from "./card.model";
 import { TCard } from "./card.type";
 import { AppError } from "../../errors/AppError";
 import { CardOverviewModel } from "../cardOverview/cardOverview.model";
+import { getMonthEnd, getMonthStart, getWeeklyRanges } from "../../utils/date";
+import { TransactionModel } from "../transaction/transaction.model";
+import httpStatus from "http-status";
 
 const getCardsFromDB = async (id: string) => {
   const result = await CardModel.find({
@@ -144,10 +147,58 @@ const deleteCardFromDB = async (id: string) => {
   }
 };
 
+const getCardMetrics = async (
+  userId: Types.ObjectId,
+  cardId: string,
+  year: number,
+  monthIndex: number,
+  timezone = "UTC"
+) => {
+  // Calculate date ranges
+  const monthStart = getMonthStart(year, monthIndex, timezone);
+  const monthEnd = getMonthEnd(year, monthIndex, timezone);
+
+  // Find the card
+  const card = await CardModel.findOne({ _id: cardId, userId });
+  if (!card) {
+    throw new AppError(httpStatus.NOT_FOUND, "Card not found");
+  }
+
+  // Fetch transactions for the card in the specified date range
+  const transactions = await TransactionModel.find({
+    user: userId,
+    card: cardId,
+    date: {
+      $gte: monthStart,
+      $lte: monthEnd,
+    },
+  });
+
+  // Aggregate metrics
+  const totalTransactions = transactions.length;
+  const totalBalance = card.totalBalance || 0;
+
+  const monthlySpending = transactions
+    .filter((transaction) => transaction.type === "expense")
+    .reduce((sum, transaction) => sum + Number(transaction.amount), 0);
+
+  const monthlyIncome = transactions
+    .filter((transaction) => transaction.type === "income")
+    .reduce((sum, transaction) => sum + Number(transaction.amount), 0);
+
+  return {
+    totalTransactions,
+    totalBalance,
+    monthlySpending,
+    monthlyIncome,
+  };
+};
+
 export const cardServices = {
   createCardToDB,
   getCardsFromDB,
   getCardsByIdFromDB,
   updateCardInDB,
   deleteCardFromDB,
+  getCardMetrics,
 };
