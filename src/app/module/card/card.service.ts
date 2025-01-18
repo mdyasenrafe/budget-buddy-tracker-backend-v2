@@ -154,6 +154,28 @@ const getCardMetrics = async (
   monthIndex: number,
   timezone = "UTC"
 ) => {
+  if (!year) {
+    throw new AppError(httpStatus.BAD_REQUEST, "'year' is required.");
+  }
+
+  if (isNaN(Number(year))) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "'year' must be a valid number."
+    );
+  }
+
+  if (!monthIndex) {
+    throw new AppError(httpStatus.BAD_REQUEST, "'monthIndex' is required.");
+  }
+
+  if (isNaN(Number(monthIndex))) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "'monthIndex' must be a valid number."
+    );
+  }
+
   const monthStart = getMonthStart(year, monthIndex, timezone);
   const monthEnd = getMonthEnd(year, monthIndex, timezone);
 

@@ -52,10 +52,30 @@ const deleteCard = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getCardMetrics = catchAsync(async (req: Request, res: Response) => {
+  const { id: cardId } = req.params;
+  const { year, month } = req.query;
+  const user = req.user;
+
+  // Fetch metrics
+  const metrics = await cardServices.getCardMetrics(
+    user?.userId,
+    cardId,
+    Number(year),
+    Number(month)
+  );
+
+  sendResponse(res, {
+    message: "Card metrics retrieved successfully",
+    data: metrics,
+  });
+});
+
 export const cardControllers = {
   createCard,
   getCards,
   getCardById,
   updateCard,
   deleteCard,
+  getCardMetrics,
 };
