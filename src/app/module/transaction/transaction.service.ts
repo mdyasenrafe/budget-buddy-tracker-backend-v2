@@ -243,10 +243,145 @@ const getWeeklyTransactionByCardIDFromDB = async (
   return weeklyTotals;
 };
 
+const deleteTransactionFromDB = async (
+  transactionId: Types.ObjectId,
+  userId: Types.ObjectId
+) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const transaction = await TransactionModel.findOne({
+      _id: transactionId,
+      user: userId,
+    }).session(session);
+
+    if (!transaction) {
+      throw new AppError(httpStatus.NOT_FOUND, "Transaction not found");
+    }
+
+    const { type, amount, budget: budgetId, card: cardId } = transaction;
+
+    if (type === "expense") {
+      if (budgetId) {
+        const budget = await BudgetModel.findById(budgetId).session(session);
+        if (!budget) {
+          throw new AppError(
+            httpStatus.NOT_FOUND,
+            "Budget not found for the transaction"
+          );
+        }
+        await BudgetModel.findByIdAndUpdate(
+          budgetId,
+          { $inc: { spent: -amount } },
+          { new: true, session }
+        );
+      }
+
+      if (cardId) {
+        const card = await CardModel.findById(cardId).session(session);
+        if (!card) {
+          throw new AppError(
+            httpStatus.NOT_FOUND,
+            "Card not found for the transaction"
+          );
+        }
+        await CardModel.findByIdAndUpdate(
+          cardId,
+          {
+            $inc: { totalBalance: amount, totalExpense: -amount },
+          },
+          { new: true, session }
+        );
+      }
+
+      const cardOverview = await CardOverviewModel.findOne({ userId }).session(
+        session
+      );
+      if (!cardOverview) {
+        throw new AppError(
+          httpStatus.NOT_FOUND,
+          "Card overview not found for the user"
+        );
+      }
+      await CardOverviewModel.findOneAndUpdate(
+        { userId },
+        {
+          $inc: { totalBalance: amount, totalExpense: -amount },
+        },
+        { new: true, session }
+      );
+    } else if (type === "income") {
+      if (cardId) {
+        const card = await CardModel.findById(cardId).session(session);
+        if (!card) {
+          throw new AppError(
+            httpStatus.NOT_FOUND,
+            "Card not found for the transaction"
+          );
+        }
+        await CardModel.findByIdAndUpdate(
+          cardId,
+          {
+            $inc: { totalBalance: -amount, totalDeposit: -amount },
+          },
+          { new: true, session }
+        );
+      }
+
+      const cardOverview = await CardOverviewModel.findOne({ userId }).session(
+        session
+      );
+      if (!cardOverview) {
+        throw new AppError(
+          httpStatus.NOT_FOUND,
+          "Card overview not found for the user"
+        );
+      }
+      await CardOverviewModel.findOneAndUpdate(
+        { userId },
+        {
+          $inc: { totalBalance: -amount, totalDeposit: -amount },
+        },
+        { new: true, session }
+      );
+    }
+
+    // Delete the transaction
+    const deleteResult =
+      await TransactionModel.findByIdAndDelete(transactionId).session(session);
+    if (!deleteResult) {
+      throw new AppError(
+        httpStatus.INTERNAL_SERVER_ERROR,
+        "Failed to delete transaction"
+      );
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return { message: "Transaction deleted successfully" };
+  } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
+
+    if (error instanceof AppError) {
+      throw error;
+    }
+
+    throw new AppError(
+      httpStatus.INTERNAL_SERVER_ERROR,
+      "An unexpected error occurred",
+      error
+    );
+  }
+};
+
 export const transactionServices = {
   addTransaction,
   getTransactionsFromDBByUserId,
   getTransactionFromDBById,
   getWeeklyTransactionByBudgetIDFromDB,
   getWeeklyTransactionByCardIDFromDB,
+  deleteTransactionFromDB,
 };
