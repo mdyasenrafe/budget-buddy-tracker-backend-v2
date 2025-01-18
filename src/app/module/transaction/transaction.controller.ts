@@ -88,10 +88,26 @@ const getWeeklyTransactionsByCardID = catchAsync(
   }
 );
 
+const deleteTransaction = catchAsync(async (req: Request, res: Response) => {
+  const currentUser = req.user;
+  const transactionId: string = req?.params?.id;
+
+  await transactionServices.deleteTransactionFromDB(
+    transactionId,
+    currentUser?.userId
+  );
+
+  sendResponse(res, {
+    message: "Transaction deleted successfully",
+    data: {},
+  });
+});
+
 export const transactionControllers = {
   createTransaction,
   getTransactions,
   getTransactionById,
   getWeeklyTransactionsByBudgetID,
   getWeeklyTransactionsByCardID,
+  deleteTransaction,
 };

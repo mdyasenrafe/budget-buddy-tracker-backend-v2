@@ -244,7 +244,7 @@ const getWeeklyTransactionByCardIDFromDB = async (
 };
 
 const deleteTransactionFromDB = async (
-  transactionId: Types.ObjectId,
+  transactionId: string,
   userId: Types.ObjectId
 ) => {
   const session = await mongoose.startSession();
