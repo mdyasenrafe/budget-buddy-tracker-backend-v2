@@ -180,6 +180,7 @@ const getWeeklyTransactionByBudgetIDFromDB = async (
   const weeklyRanges = getWeeklyRanges(monthStart, timezone);
 
   const transactions = await TransactionModel.find({
+    status: "active",
     user: userId,
     budget: budgetId,
     date: {
@@ -225,13 +226,13 @@ const getWeeklyTransactionByCardIDFromDB = async (
   let runningBalance = card.totalBalance;
 
   const transactions = await TransactionModel.find({
+    status: "active",
     user: userId,
     card: cardId,
     date: {
       $gte: monthStart,
       $lte: getMonthEnd(year, monthIndex, timezone),
     },
-    status: "active",
   });
 
   const weeklyTotals = calculateWeeklyBalances(
