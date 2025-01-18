@@ -33,5 +33,10 @@ router.delete(
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   cardControllers.deleteCard
 );
+router.get(
+  "/:id/metrics",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  cardControllers.getCardMetrics
+);
 
 export const cardRoutes = router;
