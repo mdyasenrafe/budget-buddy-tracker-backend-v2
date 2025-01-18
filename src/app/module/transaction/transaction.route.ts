@@ -34,5 +34,10 @@ router.get(
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   transactionControllers.getWeeklyTransactionsByCardID
 );
+router.delete(
+  "/:id",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  transactionControllers.deleteTransaction
+);
 
 export const transactionRoutes = router;
