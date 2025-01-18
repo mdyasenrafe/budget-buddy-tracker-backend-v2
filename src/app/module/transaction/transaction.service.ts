@@ -355,6 +355,7 @@ const deleteTransactionFromDB = async (
       { status: "deleted" },
       { new: true, session }
     );
+
     if (!deleteResult) {
       throw new AppError(
         httpStatus.INTERNAL_SERVER_ERROR,
