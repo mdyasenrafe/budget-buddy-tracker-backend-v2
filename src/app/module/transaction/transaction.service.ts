@@ -348,8 +348,13 @@ const deleteTransactionFromDB = async (
     }
 
     // Delete the transaction
-    const deleteResult =
-      await TransactionModel.findByIdAndDelete(transactionId).session(session);
+    const deleteResult = await TransactionModel.findOneAndUpdate(
+      {
+        _id: transactionId,
+      },
+      { status: "deleted" },
+      { new: true, session }
+    );
     if (!deleteResult) {
       throw new AppError(
         httpStatus.INTERNAL_SERVER_ERROR,
