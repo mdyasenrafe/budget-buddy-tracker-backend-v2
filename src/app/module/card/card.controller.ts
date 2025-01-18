@@ -54,7 +54,8 @@ const deleteCard = catchAsync(async (req: Request, res: Response) => {
 
 const getCardMetrics = catchAsync(async (req: Request, res: Response) => {
   const { id: cardId } = req.params;
-  const { year, month } = req.query;
+  const { year, monthIndex, timezone } = req.query;
+
   const user = req.user;
 
   // Fetch metrics
@@ -62,7 +63,7 @@ const getCardMetrics = catchAsync(async (req: Request, res: Response) => {
     user?.userId,
     cardId,
     Number(year),
-    Number(month)
+    Number(monthIndex)
   );
 
   sendResponse(res, {

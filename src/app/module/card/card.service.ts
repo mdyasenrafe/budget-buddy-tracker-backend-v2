@@ -165,8 +165,11 @@ const getCardMetrics = async (
     );
   }
 
-  if (!monthIndex) {
-    throw new AppError(httpStatus.BAD_REQUEST, "'monthIndex' is required.");
+  if (!monthIndex && monthIndex !== 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "'monthIndex' is required and must be between 0 (January) and 11 (December)."
+    );
   }
 
   if (isNaN(Number(monthIndex))) {
