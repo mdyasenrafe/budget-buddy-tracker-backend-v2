@@ -53,7 +53,7 @@ const createCardToDB = async (cardData: TCard, userId: string) => {
     session.endSession();
 
     throw new AppError(
-      error.statusCode || 500,
+      error.statusCode || httpStatus.INTERNAL_SERVER_ERROR,
       error.message || "An error occurred during card creation"
     );
   }
@@ -66,7 +66,7 @@ const updateCardInDB = async (id: string, updateData: Partial<TCard>) => {
   try {
     const existingCard = await CardModel.findById(id);
     if (!existingCard) {
-      throw new AppError(404, "Card not found");
+      throw new AppError(httpStatus.NOT_FOUND, "Card not found");
     }
 
     const result = await CardModel.findByIdAndUpdate(id, updateData, {
@@ -101,7 +101,7 @@ const updateCardInDB = async (id: string, updateData: Partial<TCard>) => {
     session.endSession();
 
     throw new AppError(
-      error.statusCode || 500,
+      error.statusCode || httpStatus.INTERNAL_SERVER_ERROR,
       error.message || "An error occurred during card update"
     );
   }
@@ -119,7 +119,7 @@ const deleteCardFromDB = async (id: string) => {
     );
 
     if (!card) {
-      throw new AppError(404, "Card not found");
+      throw new AppError(httpStatus.NOT_FOUND, "Card not found");
     }
 
     await CardOverviewModel.findOneAndUpdate(
@@ -141,7 +141,7 @@ const deleteCardFromDB = async (id: string) => {
     session.endSession();
 
     throw new AppError(
-      error.statusCode || 500,
+      error.statusCode || httpStatus.INTERNAL_SERVER_ERROR,
       error.message || "An error occurred during card deletion"
     );
   }
@@ -154,17 +154,14 @@ const getCardMetrics = async (
   monthIndex: number,
   timezone = "UTC"
 ) => {
-  // Calculate date ranges
   const monthStart = getMonthStart(year, monthIndex, timezone);
   const monthEnd = getMonthEnd(year, monthIndex, timezone);
 
-  // Find the card
   const card = await CardModel.findOne({ _id: cardId, userId });
   if (!card) {
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");
   }
 
-  // Fetch transactions for the card in the specified date range
   const transactions = await TransactionModel.find({
     user: userId,
     card: cardId,
