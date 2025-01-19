@@ -30,7 +30,7 @@ router.put(
   budgetControllers.editBudget
 );
 router.delete(
-  "/:id/delete",
+  "/:id",
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   budgetControllers.deleteBudget
 );
