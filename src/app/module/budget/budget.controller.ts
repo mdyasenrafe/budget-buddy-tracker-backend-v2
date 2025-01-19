@@ -31,7 +31,17 @@ const getBudgets = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getBudgetById = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const budget = await budgetServices.getBudgetByIdFromDB(id);
+  sendResponse(res, {
+    message: "Budget retrieved successfully",
+    data: budget,
+  });
+});
+
 export const budgetControllers = {
   createBudget,
   getBudgets,
+  getBudgetById,
 };

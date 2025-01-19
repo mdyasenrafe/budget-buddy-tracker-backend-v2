@@ -18,5 +18,10 @@ router.get(
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   budgetControllers.getBudgets
 );
+router.get(
+  "/:id",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  budgetControllers.getBudgetById
+);
 
 export const budgetRoutes = router;

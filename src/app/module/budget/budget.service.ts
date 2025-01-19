@@ -61,7 +61,13 @@ const getBudgetsFromDB = async (
   return budgets;
 };
 
+const getBudgetByIdFromDB = async (id: string) => {
+  const budget = await BudgetModel.findById(id);
+  return budget;
+};
+
 export const budgetServices = {
   createBudgetToDB,
   getBudgetsFromDB,
+  getBudgetByIdFromDB,
 };
