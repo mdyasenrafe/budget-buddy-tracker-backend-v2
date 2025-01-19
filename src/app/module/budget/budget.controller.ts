@@ -57,9 +57,25 @@ const editBudget = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const deleteBudget = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.user;
+
+  const updatedBudget = await budgetServices.deleteBudgetFromDB(
+    id,
+    user?.userId
+  );
+
+  sendResponse(res, {
+    message: "Budget deleted successfully",
+    data: updatedBudget,
+  });
+});
+
 export const budgetControllers = {
   createBudget,
   getBudgets,
   getBudgetById,
   editBudget,
+  deleteBudget,
 };

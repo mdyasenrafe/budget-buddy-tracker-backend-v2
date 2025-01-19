@@ -29,5 +29,10 @@ router.put(
   validateRequest(budgetValidations.TBudgetEditSchema),
   budgetControllers.editBudget
 );
+router.delete(
+  "/:id/delete",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  budgetControllers.deleteBudget
+);
 
 export const budgetRoutes = router;

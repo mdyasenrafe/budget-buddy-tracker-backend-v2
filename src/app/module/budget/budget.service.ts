@@ -106,9 +106,39 @@ const editBudgetToDB = async (
   return updatedBudget;
 };
 
+const deleteBudgetFromDB = async (
+  id: string,
+  userId: Schema.Types.ObjectId
+) => {
+  const budget = await BudgetModel.findOne({ _id: id, userId });
+
+  if (!budget) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Budget not found or you do not have permission to delete this budget"
+    );
+  }
+
+  const updatedBudget = await BudgetModel.findOneAndUpdate(
+    { _id: id, userId },
+    { $set: { status: "deleted" } },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedBudget) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Budget not found or you do not have permission to delete this budget"
+    );
+  }
+
+  return updatedBudget;
+};
+
 export const budgetServices = {
   createBudgetToDB,
   getBudgetsFromDB,
   getBudgetByIdFromDB,
   editBudgetToDB,
+  deleteBudgetFromDB,
 };
