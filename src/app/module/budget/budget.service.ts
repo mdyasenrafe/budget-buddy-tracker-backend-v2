@@ -66,8 +66,49 @@ const getBudgetByIdFromDB = async (id: string) => {
   return budget;
 };
 
+const editBudgetToDB = async (
+  id: string,
+  userId: Schema.Types.ObjectId,
+  data: Partial<TBudgetRequest>
+) => {
+  const budget = await BudgetModel.findOne({ _id: id, userId });
+
+  if (!budget) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Budget not found or you do not have permission to edit this budget"
+    );
+  }
+
+  if (data.category) {
+    const category = await CategoryModel.findOne({ _id: data.category });
+    if (!category) {
+      throw new AppError(
+        httpStatus.NOT_FOUND,
+        "The specified category does not exist"
+      );
+    }
+  }
+
+  const updatedBudget = await BudgetModel.findOneAndUpdate(
+    { _id: id, userId },
+    { $set: data },
+    { new: true, runValidators: true }
+  );
+
+  if (!updatedBudget) {
+    throw new AppError(
+      httpStatus.NOT_FOUND,
+      "Budget not found or you do not have permission to edit this budget"
+    );
+  }
+
+  return updatedBudget;
+};
+
 export const budgetServices = {
   createBudgetToDB,
   getBudgetsFromDB,
   getBudgetByIdFromDB,
+  editBudgetToDB,
 };

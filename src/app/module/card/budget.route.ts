@@ -14,7 +14,7 @@ router.post(
   budgetControllers.createBudget
 );
 router.get(
-  "/:monthIndex",
+  "/month/:monthIndex",
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   budgetControllers.getBudgets
 );
@@ -22,6 +22,12 @@ router.get(
   "/:id",
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   budgetControllers.getBudgetById
+);
+router.put(
+  "/:id",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  validateRequest(budgetValidations.TBudgetEditSchema),
+  budgetControllers.editBudget
 );
 
 export const budgetRoutes = router;

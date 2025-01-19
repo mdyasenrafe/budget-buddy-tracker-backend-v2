@@ -40,8 +40,26 @@ const getBudgetById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const editBudget = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.user;
+  const updateData = req.body;
+
+  const updatedBudget = await budgetServices.editBudgetToDB(
+    id,
+    user?.userId,
+    updateData
+  );
+
+  sendResponse(res, {
+    message: "Budget updated successfully",
+    data: updatedBudget,
+  });
+});
+
 export const budgetControllers = {
   createBudget,
   getBudgets,
   getBudgetById,
+  editBudget,
 };
