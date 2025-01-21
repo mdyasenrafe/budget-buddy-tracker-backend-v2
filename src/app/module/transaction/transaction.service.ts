@@ -11,6 +11,7 @@ import { getMonthEnd, getMonthStart, getWeeklyRanges } from "../../utils/date";
 import {
   calculateDateRangeTotals,
   calculateWeeklyBalances,
+  categorizeTransactionsByWeek,
 } from "../../utils/transactions";
 
 const getTransactionsFromDBByUserId = async (
@@ -274,8 +275,6 @@ const getWeeklyTransactionSummaryByCardID = async (
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");
   }
 
-  let runningBalance = card.totalBalance;
-
   const transactions = await TransactionModel.find({
     status: "active",
     user: userId,
@@ -286,11 +285,7 @@ const getWeeklyTransactionSummaryByCardID = async (
     },
   });
 
-  const weeklyTotals = calculateWeeklyBalances(
-    transactions,
-    weeklyRanges,
-    runningBalance
-  );
+  const weeklyTotals = categorizeTransactionsByWeek(transactions, weeklyRanges);
 
   return weeklyTotals;
 };

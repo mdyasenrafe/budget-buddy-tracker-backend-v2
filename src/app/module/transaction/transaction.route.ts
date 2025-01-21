@@ -40,4 +40,9 @@ router.delete(
   transactionControllers.deleteTransaction
 );
 
+router.get(
+  "/weekly-summary-card/:cardId",
+  transactionControllers.getWeeklyTransactionSummaryByCardID
+);
+
 export const transactionRoutes = router;
