@@ -47,6 +47,7 @@ const getBudgetsFromDB = async (
   const budgets = await BudgetModel.find({
     userId: userId,
     createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+    status: "active",
   })
     .populate("category")
     .populate("userId");
