@@ -269,7 +269,7 @@ const getWeeklyTransactionSummaryByCardID = async (
   const monthStart = getMonthStart(year, monthIndex, timezone);
   const weeklyRanges = getWeeklyRanges(monthStart, timezone);
 
-  const card = await CardModel.findOne({ _id: cardId, userId });
+  const card = await CardModel.findOne({ _id: cardId });
 
   if (!card) {
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");

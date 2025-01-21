@@ -42,6 +42,7 @@ router.delete(
 
 router.get(
   "/weekly-summary-card/:cardId",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
   transactionControllers.getWeeklyTransactionSummaryByCardID
 );
 
