@@ -37,3 +37,30 @@ export const calculateWeeklyBalances = (
     return runningBalance;
   });
 };
+
+export const categorizeTransactionsByWeek = (
+  transactions: TTransaction[],
+  weeklyRanges: TWeekRanges[]
+): { income: number[]; expense: number[] } => {
+  const income: number[] = [];
+  const expense: number[] = [];
+
+  weeklyRanges.forEach(({ start, end }) => {
+    const weeklyTransactions = transactions.filter(
+      (txn) => txn.date >= start && txn.date <= end
+    );
+
+    const weeklyIncome = weeklyTransactions
+      .filter((txn) => txn.type === "income")
+      .reduce((sum, txn) => sum + txn.amount, 0);
+
+    const weeklyExpense = weeklyTransactions
+      .filter((txn) => txn.type === "expense")
+      .reduce((sum, txn) => sum + txn.amount, 0);
+
+    income.push(weeklyIncome);
+    expense.push(weeklyExpense);
+  });
+
+  return { income, expense };
+};
