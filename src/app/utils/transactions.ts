@@ -28,10 +28,9 @@ export const calculateWeeklyBalances = (
       (txn) => txn.date >= range.start && txn.date <= range.end
     );
 
-    const weeklyTotalChange = weeklyTransactions.reduce(
-      (sum, txn) => sum + txn.amount,
-      0
-    );
+    const weeklyTotalChange = weeklyTransactions.reduce((sum, txn) => {
+      return txn.type === "income" ? sum + txn.amount : sum - txn.amount;
+    }, 0);
 
     runningBalance += weeklyTotalChange;
 
