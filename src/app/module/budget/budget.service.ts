@@ -4,7 +4,18 @@ import { BudgetModel } from "./budget.model";
 import { AppError } from "../../errors/AppError";
 import httpStatus from "http-status";
 import { CategoryModel } from "../category/category.model";
-import { getCurrentMonth } from "../../utils/date";
+import {
+  getCurrentMonth,
+  getMonthEnd,
+  getMonthStart,
+  getWeeklyRanges,
+} from "../../utils/date";
+import { CardModel } from "../card/card.model";
+import { TransactionModel } from "../transaction/transaction.model";
+import {
+  calculateDateRangeTotals,
+  categorizeTransactionsByWeek,
+} from "../../utils/transactions";
 
 const createBudgetToDB = async (
   data: TBudgetRequest,
@@ -136,10 +147,52 @@ const deleteBudgetFromDB = async (
   return updatedBudget;
 };
 
+const getWeeklyTransactionByBudgetIDFromDB = async (
+  userId: Types.ObjectId,
+  budgetId: string,
+  year: number,
+  monthIndex: number,
+  timezone: string = "UTC"
+) => {
+  if (!year || isNaN(Number(year))) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "'year' is required and must be a valid number."
+    );
+  }
+
+  if (!monthIndex && monthIndex !== 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "'monthIndex' is required and must be a valid number between 0 (January) and 11 (December)."
+    );
+  }
+
+  const monthStart = getMonthStart(year, monthIndex, timezone);
+  const monthEnd = getMonthEnd(year, monthIndex, timezone);
+
+  const weeklyRanges = getWeeklyRanges(monthStart, timezone);
+
+  const transactions = await TransactionModel.find({
+    status: "active",
+    user: userId,
+    budget: budgetId,
+    date: {
+      $gte: monthStart,
+      $lte: monthEnd,
+    },
+  });
+
+  const weeklyTotals = calculateDateRangeTotals(transactions, weeklyRanges);
+
+  return weeklyTotals;
+};
+
 export const budgetServices = {
   createBudgetToDB,
   getBudgetsFromDB,
   getBudgetByIdFromDB,
   editBudgetToDB,
   deleteBudgetFromDB,
+  getWeeklyTransactionByBudgetIDFromDB,
 };

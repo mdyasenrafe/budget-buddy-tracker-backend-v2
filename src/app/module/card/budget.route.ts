@@ -34,5 +34,10 @@ router.delete(
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   budgetControllers.deleteBudget
 );
+router.get(
+  "/weekly-transactions/:budgetId",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  budgetControllers.getWeeklyTransactionsByBudgetID
+);
 
 export const budgetRoutes = router;
