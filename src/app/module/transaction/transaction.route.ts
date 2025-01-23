@@ -24,11 +24,6 @@ router.get(
   transactionControllers.getTransactionById
 );
 
-router.get(
-  "/weekly-card-transactions/:cardId",
-  authenticateToken(userRolesObject.admin, userRolesObject.user),
-  transactionControllers.getWeeklyTransactionsByCardID
-);
 router.delete(
   "/:id",
   authenticateToken(userRolesObject.admin, userRolesObject.user),

@@ -44,28 +44,6 @@ const getTransactionById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const getWeeklyTransactionsByCardID = catchAsync(
-  async (req: Request, res: Response) => {
-    const currentUser = req.user;
-    const cardId = req?.params?.cardId;
-    const { year, monthIndex, timezone } = req.query;
-
-    const weeklyTotals =
-      await transactionServices.getWeeklyTransactionByCardIDFromDB(
-        currentUser?.userId,
-        cardId,
-        parseInt(year as string),
-        parseInt(monthIndex as string),
-        (timezone as string) || "UTC"
-      );
-
-    sendResponse(res, {
-      message: "Weekly transactions retrieved successfully",
-      data: weeklyTotals,
-    });
-  }
-);
-
 const getWeeklyTransactionSummaryByCardID = catchAsync(
   async (req: Request, res: Response) => {
     const currentUser = req.user;
@@ -107,7 +85,6 @@ export const transactionControllers = {
   createTransaction,
   getTransactions,
   getTransactionById,
-  getWeeklyTransactionsByCardID,
   deleteTransaction,
   getWeeklyTransactionSummaryByCardID,
 };

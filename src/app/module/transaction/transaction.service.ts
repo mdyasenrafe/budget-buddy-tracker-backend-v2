@@ -8,11 +8,7 @@ import { CardOverviewModel } from "../cardOverview/cardOverview.model";
 import { TransactionModel } from "./transaction.model";
 import { QueryBuilder } from "../../builder/QueryBuilder";
 import { getMonthEnd, getMonthStart, getWeeklyRanges } from "../../utils/date";
-import {
-  calculateDateRangeTotals,
-  calculateWeeklyBalances,
-  categorizeTransactionsByWeek,
-} from "../../utils/transactions";
+import { categorizeTransactionsByWeek } from "../../utils/transactions";
 
 const getTransactionsFromDBByUserId = async (
   userId: Types.ObjectId,
@@ -152,57 +148,6 @@ const handleIncomeTransaction = async (
     },
     { new: true, upsert: true, session }
   );
-};
-
-const getWeeklyTransactionByCardIDFromDB = async (
-  userId: Types.ObjectId,
-  cardId: string,
-  year: number,
-  monthIndex: number,
-  timezone: string = "UTC"
-) => {
-  if (!year || isNaN(Number(year))) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "'year' is required and must be a valid number."
-    );
-  }
-
-  if (!monthIndex && monthIndex !== 0) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "'monthIndex' is required and must be a valid number between 0 (January) and 11 (December)."
-    );
-  }
-
-  const monthStart = getMonthStart(year, monthIndex, timezone);
-  const weeklyRanges = getWeeklyRanges(monthStart, timezone);
-
-  const card = await CardModel.findOne({ _id: cardId, userId });
-
-  if (!card) {
-    throw new AppError(httpStatus.NOT_FOUND, "Card not found");
-  }
-
-  let runningBalance = card.totalBalance;
-
-  const transactions = await TransactionModel.find({
-    status: "active",
-    user: userId,
-    card: cardId,
-    date: {
-      $gte: monthStart,
-      $lte: getMonthEnd(year, monthIndex, timezone),
-    },
-  });
-
-  const weeklyTotals = calculateWeeklyBalances(
-    transactions,
-    weeklyRanges,
-    runningBalance
-  );
-
-  return weeklyTotals;
 };
 
 const getWeeklyTransactionSummaryByCardID = async (
@@ -394,7 +339,6 @@ export const transactionServices = {
   addTransaction,
   getTransactionsFromDBByUserId,
   getTransactionFromDBById,
-  getWeeklyTransactionByCardIDFromDB,
   deleteTransactionFromDB,
   getWeeklyTransactionSummaryByCardID,
 };

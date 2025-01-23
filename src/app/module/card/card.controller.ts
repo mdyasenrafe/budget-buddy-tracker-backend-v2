@@ -72,6 +72,27 @@ const getCardMetrics = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getWeeklyTransactionsByCardID = catchAsync(
+  async (req: Request, res: Response) => {
+    const currentUser = req.user;
+    const cardId = req?.params?.cardId;
+    const { year, monthIndex, timezone } = req.query;
+
+    const weeklyTotals = await cardServices.getWeeklyTransactionByCardIDFromDB(
+      currentUser?.userId,
+      cardId,
+      parseInt(year as string),
+      parseInt(monthIndex as string),
+      (timezone as string) || "UTC"
+    );
+
+    sendResponse(res, {
+      message: "Weekly transactions retrieved successfully",
+      data: weeklyTotals,
+    });
+  }
+);
+
 export const cardControllers = {
   createCard,
   getCards,
@@ -79,4 +100,5 @@ export const cardControllers = {
   updateCard,
   deleteCard,
   getCardMetrics,
+  getWeeklyTransactionsByCardID,
 };

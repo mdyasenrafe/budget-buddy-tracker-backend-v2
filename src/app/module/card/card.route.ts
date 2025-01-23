@@ -39,4 +39,10 @@ router.get(
   cardControllers.getCardMetrics
 );
 
+router.get(
+  "/weekly-transactions/:cardId",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  cardControllers.getWeeklyTransactionsByCardID
+);
+
 export const cardRoutes = router;

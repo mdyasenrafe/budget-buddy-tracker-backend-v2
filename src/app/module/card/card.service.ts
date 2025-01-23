@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 import { CardModel } from "./card.model";
 import { TCard } from "./card.type";
 import { AppError } from "../../errors/AppError";
@@ -6,6 +6,7 @@ import { CardOverviewModel } from "../cardOverview/cardOverview.model";
 import { getMonthEnd, getMonthStart, getWeeklyRanges } from "../../utils/date";
 import { TransactionModel } from "../transaction/transaction.model";
 import httpStatus from "http-status";
+import { calculateWeeklyBalances } from "../../utils/transactions";
 
 const getCardsFromDB = async (id: string) => {
   const result = await CardModel.find({
@@ -216,6 +217,57 @@ const getCardMetrics = async (
   };
 };
 
+const getWeeklyTransactionByCardIDFromDB = async (
+  userId: Types.ObjectId,
+  cardId: string,
+  year: number,
+  monthIndex: number,
+  timezone: string = "UTC"
+) => {
+  if (!year || isNaN(Number(year))) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "'year' is required and must be a valid number."
+    );
+  }
+
+  if (!monthIndex && monthIndex !== 0) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "'monthIndex' is required and must be a valid number between 0 (January) and 11 (December)."
+    );
+  }
+
+  const monthStart = getMonthStart(year, monthIndex, timezone);
+  const weeklyRanges = getWeeklyRanges(monthStart, timezone);
+
+  const card = await CardModel.findOne({ _id: cardId, userId });
+
+  if (!card) {
+    throw new AppError(httpStatus.NOT_FOUND, "Card not found");
+  }
+
+  let runningBalance = card.totalBalance;
+
+  const transactions = await TransactionModel.find({
+    status: "active",
+    user: userId,
+    card: cardId,
+    date: {
+      $gte: monthStart,
+      $lte: getMonthEnd(year, monthIndex, timezone),
+    },
+  });
+
+  const weeklyTotals = calculateWeeklyBalances(
+    transactions,
+    weeklyRanges,
+    runningBalance
+  );
+
+  return weeklyTotals;
+};
+
 export const cardServices = {
   createCardToDB,
   getCardsFromDB,
@@ -223,4 +275,5 @@ export const cardServices = {
   updateCardInDB,
   deleteCardFromDB,
   getCardMetrics,
+  getWeeklyTransactionByCardIDFromDB,
 };
