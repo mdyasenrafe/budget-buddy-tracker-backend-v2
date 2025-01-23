@@ -45,4 +45,10 @@ router.get(
   cardControllers.getWeeklyTransactionsByCardID
 );
 
+router.get(
+  "/weekly-summary/:cardId",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  cardControllers.getWeeklyTransactionSummaryByCardID
+);
+
 export const cardRoutes = router;

@@ -150,51 +150,6 @@ const handleIncomeTransaction = async (
   );
 };
 
-const getWeeklyTransactionSummaryByCardID = async (
-  userId: Types.ObjectId,
-  cardId: string,
-  year: number,
-  monthIndex: number,
-  timezone: string = "UTC"
-) => {
-  if (!year || isNaN(Number(year))) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "'year' is required and must be a valid number."
-    );
-  }
-
-  if (!monthIndex && monthIndex !== 0) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "'monthIndex' is required and must be a valid number between 0 (January) and 11 (December)."
-    );
-  }
-
-  const monthStart = getMonthStart(year, monthIndex, timezone);
-  const weeklyRanges = getWeeklyRanges(monthStart, timezone);
-
-  const card = await CardModel.findOne({ _id: cardId });
-
-  if (!card) {
-    throw new AppError(httpStatus.NOT_FOUND, "Card not found");
-  }
-
-  const transactions = await TransactionModel.find({
-    status: "active",
-    user: userId,
-    card: cardId,
-    date: {
-      $gte: monthStart,
-      $lte: getMonthEnd(year, monthIndex, timezone),
-    },
-  });
-
-  const weeklyTotals = categorizeTransactionsByWeek(transactions, weeklyRanges);
-
-  return weeklyTotals;
-};
-
 const deleteTransactionFromDB = async (
   transactionId: string,
   userId: Types.ObjectId
@@ -340,5 +295,4 @@ export const transactionServices = {
   getTransactionsFromDBByUserId,
   getTransactionFromDBById,
   deleteTransactionFromDB,
-  getWeeklyTransactionSummaryByCardID,
 };
