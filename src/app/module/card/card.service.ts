@@ -159,30 +159,7 @@ const getCardMetrics = async (
   monthIndex: number,
   timezone = "UTC"
 ) => {
-  if (!year) {
-    throw new AppError(httpStatus.BAD_REQUEST, "'year' is required.");
-  }
-
-  if (isNaN(Number(year))) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "'year' must be a valid number."
-    );
-  }
-
-  if (!monthIndex && monthIndex !== 0) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "'monthIndex' is required and must be between 0 (January) and 11 (December)."
-    );
-  }
-
-  if (isNaN(Number(monthIndex))) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "'monthIndex' must be a valid number."
-    );
-  }
+  validateYearAndMonth({ year: year, monthIndex: monthIndex });
 
   const monthStart = getMonthStart(year, monthIndex, timezone);
   const monthEnd = getMonthEnd(year, monthIndex, timezone);
@@ -229,19 +206,7 @@ const getWeeklyTransactionByCardIDFromDB = async (
   monthIndex: number,
   timezone: string = "UTC"
 ) => {
-  if (!year || isNaN(Number(year))) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "'year' is required and must be a valid number."
-    );
-  }
-
-  if (!monthIndex && monthIndex !== 0) {
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      "'monthIndex' is required and must be a valid number between 0 (January) and 11 (December)."
-    );
-  }
+  validateYearAndMonth({ year: year, monthIndex: monthIndex });
 
   const monthStart = getMonthStart(year, monthIndex, timezone);
   const weeklyRanges = getWeeklyRanges(monthStart, timezone);
