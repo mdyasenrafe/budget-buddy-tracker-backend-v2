@@ -351,6 +351,7 @@ const getSpendingCategoriesByCardID = async (
     status: "active",
     user: userId,
     card: cardId,
+    type: "expense",
     date: { $gte: monthStart, $lte: monthEnd },
   }).populate("category");
 
@@ -374,7 +375,11 @@ const getSpendingCategoriesByCardID = async (
     })
   );
 
-  return finalResult;
+  const sortedCategories = finalResult.sort(
+    (a: { amount: number }, b: { amount: number }) => b.amount - a.amount
+  );
+
+  return sortedCategories;
 };
 
 export const cardServices = {
