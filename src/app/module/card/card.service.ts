@@ -194,6 +194,7 @@ const getCardMetrics = async (
   const transactions = await TransactionModel.find({
     user: userId,
     card: cardId,
+    status: "active",
     date: {
       $gte: monthStart,
       $lte: monthEnd,
