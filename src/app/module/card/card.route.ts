@@ -50,5 +50,10 @@ router.get(
   authenticateToken(userRolesObject.admin, userRolesObject.user),
   cardControllers.getWeeklyTransactionSummaryByCardID
 );
+router.get(
+  "/spending-category/:cardId",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  cardControllers.getSpendingCategoriesByCardID
+);
 
 export const cardRoutes = router;

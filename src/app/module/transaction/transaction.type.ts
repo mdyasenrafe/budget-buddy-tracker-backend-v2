@@ -3,6 +3,7 @@ import {
   TTransactionStatusValues,
   TTransactionTypeValues,
 } from "./transaction.constant";
+import { TCategory } from "../category/category.types";
 
 export type TTransaction = {
   title: string;
@@ -11,7 +12,7 @@ export type TTransaction = {
   date: Date;
   type: (typeof TTransactionTypeValues)[number];
   budget?: Types.ObjectId;
-  category: Types.ObjectId;
+  category: TCategory;
   user: Types.ObjectId;
   card?: Types.ObjectId;
   status: (typeof TTransactionStatusValues)[number];
