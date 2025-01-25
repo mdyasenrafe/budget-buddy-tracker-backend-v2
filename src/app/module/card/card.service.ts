@@ -179,7 +179,6 @@ const getCardMetrics = async (
     },
   });
 
-  // Aggregate metrics
   const totalTransactions = transactions.length;
   const totalBalance = card.totalBalance || 0;
 
