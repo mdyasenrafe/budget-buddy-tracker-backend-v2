@@ -20,13 +20,6 @@ const retrieveDashboardMetrics = async (
 
   const userCards = await CardModel.find({ userId, status: "active" });
 
-  if (!userCards || userCards.length === 0) {
-    throw new AppError(
-      httpStatus.NOT_FOUND,
-      "No cards found for the user. Please add a card and try again."
-    );
-  }
-
   const userCardOverview = await CardOverviewModel.findOne({ userId });
 
   if (!userCardOverview) {
