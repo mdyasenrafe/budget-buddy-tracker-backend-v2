@@ -74,7 +74,7 @@ const updateCardInDB = async (id: string, updateData: Partial<TCard>) => {
       throw new AppError(httpStatus.NOT_FOUND, "Card not found");
     }
 
-    if (existingCard.status !== "deleted") {
+    if (existingCard.status === "deleted") {
       throw new AppError(
         httpStatus.BAD_REQUEST,
         "The card is not marked as deleted and cannot be updated."
@@ -177,7 +177,7 @@ const getCardMetrics = async (
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");
   }
 
-  if (card.status !== "deleted") {
+  if (card.status === "deleted") {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "The card is not marked as deleted and cannot be updated."
@@ -231,7 +231,7 @@ const getWeeklyTransactionByCardIDFromDB = async (
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");
   }
 
-  if (card.status !== "deleted") {
+  if (card.status === "deleted") {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "The card is not marked as deleted and cannot be updated."
@@ -277,7 +277,7 @@ const getWeeklyTransactionSummaryByCardID = async (
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");
   }
 
-  if (card.status !== "deleted") {
+  if (card.status === "deleted") {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "The card is not marked as deleted and cannot be updated."
@@ -316,7 +316,7 @@ const getSpendingCategoriesByCardID = async (
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");
   }
 
-  if (card.status !== "deleted") {
+  if (card.status === "deleted") {
     throw new AppError(
       httpStatus.BAD_REQUEST,
       "The card is not marked as deleted and cannot be updated."
