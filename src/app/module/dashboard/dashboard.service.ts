@@ -18,7 +18,8 @@ const retrieveDashboardMetrics = async (
   const monthStartDate = getMonthStart(year, monthIndex, timezone);
   const monthEndDate = getMonthEnd(year, monthIndex, timezone);
 
-  const userCards = await CardModel.find({ userId });
+  const userCards = await CardModel.find({ userId, status: "active" });
+  console.log(userCards);
   if (!userCards || userCards.length === 0) {
     throw new AppError(
       httpStatus.NOT_FOUND,
