@@ -7,6 +7,7 @@ import { cardOverviewRoutes } from "../module/cardOverview/cardOverview.route";
 import { cardRoutes } from "../module/card/card.route";
 import { budgetRoutes } from "../module/card/budget.route";
 import { transactionRoutes } from "../module/transaction/transaction.route";
+import { dashboardRoutes } from "../module/dashboard/dashboard.route";
 
 const router = Router();
 
@@ -42,6 +43,10 @@ const modulesRoutes = [
   {
     path: "/transaction",
     route: transactionRoutes,
+  },
+  {
+    path: "/dashboard",
+    route: dashboardRoutes,
   },
 ];
 

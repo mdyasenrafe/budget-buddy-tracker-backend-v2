@@ -18,3 +18,7 @@ const getDashboardMetrics = catchAsync(async (req: Request, res: Response) => {
     data: dashboardMetrics,
   });
 });
+
+export const dashboardControllers = {
+  getDashboardMetrics,
+};
