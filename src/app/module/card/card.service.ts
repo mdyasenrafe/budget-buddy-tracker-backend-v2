@@ -74,6 +74,13 @@ const updateCardInDB = async (id: string, updateData: Partial<TCard>) => {
       throw new AppError(httpStatus.NOT_FOUND, "Card not found");
     }
 
+    if (existingCard.status !== "deleted") {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "The card is not marked as deleted and cannot be updated."
+      );
+    }
+
     const result = await CardModel.findByIdAndUpdate(id, updateData, {
       new: true,
       runValidators: true,
@@ -165,8 +172,16 @@ const getCardMetrics = async (
   const monthEnd = getMonthEnd(year, monthIndex, timezone);
 
   const card = await CardModel.findOne({ _id: cardId, userId });
+
   if (!card) {
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");
+  }
+
+  if (card.status !== "deleted") {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "The card is not marked as deleted and cannot be updated."
+    );
   }
 
   const transactions = await TransactionModel.find({
@@ -216,6 +231,13 @@ const getWeeklyTransactionByCardIDFromDB = async (
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");
   }
 
+  if (card.status !== "deleted") {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "The card is not marked as deleted and cannot be updated."
+    );
+  }
+
   let runningBalance = card.totalBalance;
 
   const transactions = await TransactionModel.find({
@@ -255,6 +277,13 @@ const getWeeklyTransactionSummaryByCardID = async (
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");
   }
 
+  if (card.status !== "deleted") {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "The card is not marked as deleted and cannot be updated."
+    );
+  }
+
   const transactions = await TransactionModel.find({
     status: "active",
     user: userId,
@@ -285,6 +314,13 @@ const getSpendingCategoriesByCardID = async (
 
   if (!card) {
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");
+  }
+
+  if (card.status !== "deleted") {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "The card is not marked as deleted and cannot be updated."
+    );
   }
 
   const transactions = await TransactionModel.find({
