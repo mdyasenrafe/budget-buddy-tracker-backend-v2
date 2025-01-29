@@ -11,4 +11,10 @@ router.get(
   dashboardControllers.getDashboardMetrics
 );
 
+router.get(
+  "/balance-trend",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  dashboardControllers.getBalanceTrend
+);
+
 export const dashboardRoutes = router;

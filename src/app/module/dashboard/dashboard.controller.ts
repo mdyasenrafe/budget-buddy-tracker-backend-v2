@@ -19,6 +19,24 @@ const getDashboardMetrics = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getBalanceTrend = catchAsync(async (req: Request, res: Response) => {
+  const currentUser = req.user;
+  const { year, monthIndex, timezone } = req.query;
+
+  const balanceTrend = await dashboardServices.getBalanceTrend(
+    currentUser?.userId,
+    Number(year),
+    Number(monthIndex),
+    timezone as string
+  );
+
+  sendResponse(res, {
+    message: "Balance trend fetched successfully.",
+    data: balanceTrend,
+  });
+});
+
 export const dashboardControllers = {
   getDashboardMetrics,
+  getBalanceTrend,
 };
