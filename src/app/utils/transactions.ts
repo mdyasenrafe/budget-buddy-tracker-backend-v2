@@ -23,19 +23,30 @@ export const calculateWeeklyBalances = (
   weeklyRanges: TWeekRanges[],
   runningBalance: number
 ) => {
-  return weeklyRanges.map((range) => {
+  let weeklyBalances: number[] = new Array(weeklyRanges.length).fill(0);
+
+  // Reverse loop to calculate backward
+  for (let i = weeklyRanges.length - 1; i >= 0; i--) {
+    const range = weeklyRanges[i];
+
+    // Get transactions for the current week
     const weeklyTransactions = transactions.filter(
       (txn) => txn.date >= range.start && txn.date <= range.end
     );
 
+    // Calculate the net weekly change
     const weeklyTotalChange = weeklyTransactions.reduce((sum, txn) => {
       return txn.type === "income" ? sum + txn.amount : sum - txn.amount;
     }, 0);
 
-    runningBalance += weeklyTotalChange;
+    // Set the running balance for this week
+    weeklyBalances[i] = runningBalance;
 
-    return runningBalance;
-  });
+    // Adjust running balance for previous week
+    runningBalance -= weeklyTotalChange;
+  }
+
+  return weeklyBalances;
 };
 
 export const categorizeTransactionsByWeek = (
