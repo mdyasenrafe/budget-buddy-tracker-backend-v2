@@ -63,7 +63,8 @@ const getCardMetrics = catchAsync(async (req: Request, res: Response) => {
     user?.userId,
     cardId,
     Number(year),
-    Number(monthIndex)
+    Number(monthIndex),
+    (timezone as string) || "UTC"
   );
 
   sendResponse(res, {
