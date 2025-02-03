@@ -26,10 +26,15 @@ export class QueryBuilder<T> {
   }
 
   filter() {
-    let queryObj: any = { ...this.query };
+    let queryObj = { ...this.query };
     const excludeFields = ["searchTerm", "sort", "limit", "page", "fields"];
+    excludeFields.forEach((field) => delete queryObj[field]);
 
-    excludeFields.forEach((el) => delete queryObj[el]);
+    const queryStr = JSON.stringify(queryObj).replace(
+      /\b(gte|gt|lte|lt|in)\b/g,
+      (match) => `$${match}`
+    );
+    queryObj = JSON.parse(queryStr);
 
     this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
 
