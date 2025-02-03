@@ -17,4 +17,10 @@ router.get(
   dashboardControllers.getBalanceTrend
 );
 
+router.get(
+  "/weekly-spend-income",
+  authenticateToken(userRolesObject.admin, userRolesObject.user),
+  dashboardControllers.getWeeklySpendIncomeComparison
+);
+
 export const dashboardRoutes = router;

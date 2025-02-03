@@ -6,7 +6,10 @@ import { AppError } from "../../errors/AppError";
 import httpStatus from "http-status";
 import { TransactionModel } from "../transaction/transaction.model";
 import { CardOverviewModel } from "../cardOverview/cardOverview.model";
-import { calculateWeeklyBalances } from "../../utils/transactions";
+import {
+  calculateWeeklyBalances,
+  categorizeTransactionsByWeek,
+} from "../../utils/transactions";
 
 const retrieveDashboardMetrics = async (
   userId: Types.ObjectId,
@@ -93,7 +96,41 @@ const getBalanceTrend = async (
   return weeklyTotals;
 };
 
+const getWeeklySpendIncomeComparison = async (
+  userId: Types.ObjectId,
+  year: number,
+  monthIndex: number,
+  timezone = "UTC"
+) => {
+  validateYearAndMonth({ year, monthIndex });
+  const monthStart = getMonthStart(year, monthIndex, timezone);
+  const weeklyRanges = getWeeklyRanges(monthStart, timezone);
+
+  const card = await CardOverviewModel.findOne({ userId: userId });
+
+  if (!card) {
+    throw new AppError(httpStatus.NOT_FOUND, "Card not found");
+  }
+
+  const transactions = await TransactionModel.find({
+    status: "active",
+    user: userId,
+    date: {
+      $gte: monthStart,
+      $lte: getMonthEnd(year, monthIndex, timezone),
+    },
+  });
+
+  const weeklyComparison = categorizeTransactionsByWeek(
+    transactions,
+    weeklyRanges
+  );
+
+  return weeklyComparison;
+};
+
 export const dashboardServices = {
   retrieveDashboardMetrics,
   getBalanceTrend,
+  getWeeklySpendIncomeComparison,
 };
