@@ -93,7 +93,44 @@ const getBalanceTrend = async (
   return weeklyTotals;
 };
 
+const getWeeklySpendIncomeComparison = async (
+  userId: Types.ObjectId,
+  year: number,
+  monthIndex: number,
+  timezone = "UTC"
+) => {
+  validateYearAndMonth({ year, monthIndex });
+  const monthStart = getMonthStart(year, monthIndex, timezone);
+  const weeklyRanges = getWeeklyRanges(monthStart, timezone);
+
+  const card = await CardOverviewModel.findOne({ userId: userId });
+
+  if (!card) {
+    throw new AppError(httpStatus.NOT_FOUND, "Card not found");
+  }
+
+  let runningBalance = card.totalBalance;
+
+  const transactions = await TransactionModel.find({
+    status: "active",
+    user: userId,
+    date: {
+      $gte: monthStart,
+      $lte: getMonthEnd(year, monthIndex, timezone),
+    },
+  });
+
+  const weeklyComparison = calculateWeeklyBalances(
+    transactions,
+    weeklyRanges,
+    runningBalance
+  );
+
+  return weeklyComparison;
+};
+
 export const dashboardServices = {
   retrieveDashboardMetrics,
   getBalanceTrend,
+  getWeeklySpendIncomeComparison,
 };

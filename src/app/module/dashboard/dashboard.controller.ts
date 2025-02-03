@@ -36,7 +36,28 @@ const getBalanceTrend = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getWeeklySpendIncomeComparison = catchAsync(
+  async (req: Request, res: Response) => {
+    const currentUser = req.user;
+    const { year, monthIndex, timezone } = req.query;
+
+    const weeklyComparison =
+      await dashboardServices.getWeeklySpendIncomeComparison(
+        currentUser?.userId,
+        Number(year),
+        Number(monthIndex),
+        timezone as string
+      );
+
+    sendResponse(res, {
+      message: "Weekly spend-income comparison fetched successfully.",
+      data: weeklyComparison,
+    });
+  }
+);
+
 export const dashboardControllers = {
   getDashboardMetrics,
   getBalanceTrend,
+  getWeeklySpendIncomeComparison,
 };
