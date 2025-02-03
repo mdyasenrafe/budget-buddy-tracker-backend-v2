@@ -6,7 +6,10 @@ import { AppError } from "../../errors/AppError";
 import httpStatus from "http-status";
 import { TransactionModel } from "../transaction/transaction.model";
 import { CardOverviewModel } from "../cardOverview/cardOverview.model";
-import { calculateWeeklyBalances } from "../../utils/transactions";
+import {
+  calculateWeeklyBalances,
+  categorizeTransactionsByWeek,
+} from "../../utils/transactions";
 
 const retrieveDashboardMetrics = async (
   userId: Types.ObjectId,
@@ -109,8 +112,6 @@ const getWeeklySpendIncomeComparison = async (
     throw new AppError(httpStatus.NOT_FOUND, "Card not found");
   }
 
-  let runningBalance = card.totalBalance;
-
   const transactions = await TransactionModel.find({
     status: "active",
     user: userId,
@@ -120,10 +121,9 @@ const getWeeklySpendIncomeComparison = async (
     },
   });
 
-  const weeklyComparison = calculateWeeklyBalances(
+  const weeklyComparison = categorizeTransactionsByWeek(
     transactions,
-    weeklyRanges,
-    runningBalance
+    weeklyRanges
   );
 
   return weeklyComparison;
