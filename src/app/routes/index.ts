@@ -8,6 +8,7 @@ import { cardRoutes } from "../module/card/card.route";
 import { budgetRoutes } from "../module/card/budget.route";
 import { transactionRoutes } from "../module/transaction/transaction.route";
 import { dashboardRoutes } from "../module/dashboard/dashboard.route";
+import { analyticsRoutes } from "../module/analytics/analytics.route";
 
 const router = Router();
 
@@ -47,6 +48,10 @@ const modulesRoutes = [
   {
     path: "/dashboard",
     route: dashboardRoutes,
+  },
+  {
+    path: "/analytics",
+    route: analyticsRoutes,
   },
 ];
 
