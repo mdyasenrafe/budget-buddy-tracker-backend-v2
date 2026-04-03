@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import { TransactionModel } from "../transaction/transaction.model";
+import { CategoryModel } from "../category/category.model";
 import { getMonthEnd, getMonthStart } from "../../utils/date";
 
 const getAnalyticsFromDB = async (
@@ -8,13 +9,16 @@ const getAnalyticsFromDB = async (
   year: number,
   month: number,
   timezone: string,
-  categoryIds?: string
+  categoryIds?: string,
 ) => {
   const startDate = getMonthStart(year, month, timezone);
   const endDate = getMonthEnd(year, month, timezone);
 
+  const normalizedUserId =
+    typeof userId === "string" ? new Types.ObjectId(userId) : userId;
+
   const matchStage: any = {
-    user: userId,
+    user: normalizedUserId,
     type,
     status: "active",
     date: {
@@ -24,11 +28,13 @@ const getAnalyticsFromDB = async (
   };
 
   if (categoryIds) {
-    const ids = categoryIds.split(",").map((id) => new Types.ObjectId(id.trim()));
+    const ids = categoryIds
+      .split(",")
+      .map((id) => new Types.ObjectId(id.trim()));
     matchStage.category = { $in: ids };
   }
 
-  const aggregation = await TransactionModel.aggregate([
+  const groupedTransactions = await TransactionModel.aggregate([
     { $match: matchStage },
     {
       $group: {
@@ -36,30 +42,43 @@ const getAnalyticsFromDB = async (
         totalAmount: { $sum: "$amount" },
       },
     },
-    {
-      $lookup: {
-        from: "categories",
-        localField: "_id",
-        foreignField: "_id",
-        as: "categoryDetails",
-      },
-    },
-    { $unwind: "$categoryDetails" },
-    {
-      $project: {
-        _id: 1,
-        totalAmount: 1,
-        label: "$categoryDetails.label",
-      },
-    },
     { $sort: { totalAmount: -1 } },
   ]);
 
-  const total = aggregation.reduce((sum, item) => sum + item.totalAmount, 0);
+  const categoryObjectIds = groupedTransactions
+    .map((item) => {
+      try {
+        return new Types.ObjectId(String(item._id));
+      } catch {
+        return null;
+      }
+    })
+    .filter(Boolean) as Types.ObjectId[];
+
+  const categories = await CategoryModel.find({
+    _id: { $in: categoryObjectIds },
+  })
+    .select("_id label")
+    .lean();
+
+  const categoryMap = new Map(
+    categories.map((category: any) => [String(category._id), category.label]),
+  );
+
+  const finalCategories = groupedTransactions.map((item) => ({
+    _id: String(item._id),
+    totalAmount: item.totalAmount,
+    label: categoryMap.get(String(item._id)) || "Unknown",
+  }));
+
+  const total = finalCategories.reduce(
+    (sum, item) => sum + item.totalAmount,
+    0,
+  );
 
   return {
     total,
-    categories: aggregation,
+    categories: finalCategories,
   };
 };
 
@@ -68,7 +87,7 @@ const getSpendingAnalyticsFromDB = async (
   year: number,
   month: number,
   timezone: string,
-  categoryIds?: string
+  categoryIds?: string,
 ) => {
   return await getAnalyticsFromDB(
     userId,
@@ -76,7 +95,7 @@ const getSpendingAnalyticsFromDB = async (
     year,
     month,
     timezone,
-    categoryIds
+    categoryIds,
   );
 };
 
@@ -85,7 +104,7 @@ const getIncomeAnalyticsFromDB = async (
   year: number,
   month: number,
   timezone: string,
-  categoryIds?: string
+  categoryIds?: string,
 ) => {
   return await getAnalyticsFromDB(
     userId,
@@ -93,7 +112,7 @@ const getIncomeAnalyticsFromDB = async (
     year,
     month,
     timezone,
-    categoryIds
+    categoryIds,
   );
 };
 
